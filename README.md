@@ -45,7 +45,7 @@ geo-claude-plugins/
 └── CHANGELOG.md
 ```
 
-Différence avec le dépôt Microsoft : ici **pas de génération automatique**. Chaque skill n'existe qu'à un seul endroit (`plugins/<plugin>/skills/`) et `marketplace.json` est édité à la main.
+Chaque skill n'existe qu'à un seul endroit (`plugins/<plugin>/skills/`). La liste `plugins` de `marketplace.json` est **générée automatiquement** depuis les `plugin.json` (`npm run generate`) ; un workflow GitHub Actions (`.github/workflows/generate-marketplace.yml`), déclenché par le webhook `push` sur `main`, la régénère et la commit si elle a changé. L'en-tête (`name`, `owner`, `metadata`) reste édité à la main.
 
 ## Installation (Claude Code)
 
@@ -76,7 +76,7 @@ Activer la mise à jour automatique : dans Claude Code, `/plugin` → **Marketpl
 1. Copier `templates/skill-template/` vers `plugins/geo-powerbi/skills/<nouveau-nom>/`.
 2. Renseigner `name` (identique au nom du dossier, en kebab-case) et `description` (quand l'utiliser — c'est ce qui déclenche le skill).
 3. Garder `SKILL.md` court (< 300 lignes) ; déplacer les détails dans `references/`.
-4. **Incrémenter la version** dans `plugins/geo-powerbi/.claude-plugin/plugin.json` **et** `.claude-plugin/marketplace.json` (mêmes valeurs).
+4. **Version** : incrémentée automatiquement après le push (patch, `feat` → mineur, `!:`/`BREAKING CHANGE` → majeur) si tu ne l'as pas changée toi-même dans `plugin.json` ; `marketplace.json` est resynchronisé dans la foulée.
 5. Ajouter une entrée dans `CHANGELOG.md`.
 6. Valider puis publier :
 
