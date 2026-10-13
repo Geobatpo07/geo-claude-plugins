@@ -1,4 +1,4 @@
-# solutions-claude-plugins
+# geo-claude-plugins
 
 Marketplace **Claude Code** de skills personnalisés pour **Power BI / Microsoft Fabric**.
 
@@ -28,7 +28,7 @@ Modèle pour créer un nouveau skill : [`templates/skill-template/`](templates/s
 ## Structure
 
 ```
-solutions-claude-plugins/
+geo-claude-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json          # catalogue des plugins (marketplace « geo-collection »)
 ├── plugins/
@@ -58,14 +58,14 @@ claude plugin install fabric-skills@fabric-collection
 claude plugin install powerbi-authoring@fabric-collection
 
 # 2. Nos skills
-claude plugin marketplace add Geobatpo07/solutions-claude-plugins
+claude plugin marketplace add Geobatpo07/geo-claude-plugins
 claude plugin install geo-powerbi@geo-collection
 ```
 
 Test local, avant de pousser sur GitHub :
 
 ```powershell
-claude plugin marketplace add "C:\Users\gblaguerre\Documents\Data Analytics Projects\solutions-claude-plugins"
+claude plugin marketplace add "C:\Users\gblaguerre\Documents\Data Analytics Projects\geo-claude-plugins"
 claude plugin install geo-powerbi@geo-collection
 ```
 
