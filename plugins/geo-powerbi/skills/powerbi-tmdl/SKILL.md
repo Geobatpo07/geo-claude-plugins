@@ -38,14 +38,14 @@ Exemples complets : [references/syntaxe.md](references/syntaxe.md).
 
 ## Processus d'édition
 
-1. **Fermer Power BI Desktop** (ou utiliser la vue TMDL intégrée, voir plus bas) : Desktop ne recharge pas les fichiers modifiés à l'extérieur.
+1. **Synchronisation avec Power BI Desktop** (versions récentes de Desktop) : **enregistrer** dans Desktop avant d'écrire (l'agent lit les fichiers sur disque, pas la fenêtre). Après écriture, Desktop détecte les fichiers modifiés et propose d'**appliquer les changements externes** ; sinon, recharger via le **Desktop Bridge** (Options → Fonctionnalités en préversion → *Enable external tool access to Power BI Desktop through secure local APIs*) qui permet aussi à l'agent de faire des captures d'écran. Sur une version plus ancienne : **fermer Desktop** avant d'écrire. Dans tous les cas, ne jamais enregistrer depuis Desktop pendant que l'agent écrit (écrasement).
 2. Vérifier que le projet est sous **Git** et que l'arbre est propre (`git status`) pour pouvoir revenir en arrière.
 3. Lire `model.tmdl`, `relationships.tmdl` et les tables concernées avant d'écrire.
 4. Proposer les modifications (diff) et **attendre la validation** pour toute suppression, renommage ou changement de relation.
 5. Écrire en respectant l'indentation existante du fichier (tabulations).
 6. Ajout de table : créer `tables/<Nom>.tmdl` et, si `model.tmdl` contient des lignes `ref table …`, y ajouter `ref table <Nom>`.
 7. **Renommage** : mettre à jour toutes les références (mesures DAX, relations, `sortByColumn`, hiérarchies, rôles, cultures, rapport PBIR). Rechercher l'ancien nom dans tout le dossier `definition/` **et** dans `*.Report/`.
-8. Rouvrir le `.pbip` dans Desktop : les erreurs de syntaxe s'affichent à l'ouverture. Corriger puis vérifier les valeurs avec une requête DAX.
+8. Appliquer les changements externes (ou rouvrir le `.pbip`) : les erreurs de syntaxe s'affichent au chargement. Corriger puis vérifier les valeurs avec une requête DAX.
 9. `git diff` pour relire, puis commit.
 
 ## Vue TMDL de Power BI Desktop

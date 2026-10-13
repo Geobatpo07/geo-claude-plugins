@@ -19,6 +19,16 @@ Ce skill fait foi pour le **style**. Les skills Microsoft (`semantic-model-autho
 6. **Résumer** les changements dans un tableau objet / action / raison.
 
 Ne jamais travailler directement sur un modèle de **production** : passer par l'espace de travail de développement ou une copie PBIP.
+Avant toute écriture : le projet doit être sous **Git** avec un arbre propre (commit de sauvegarde), pour que chaque modification soit réversible.
+
+## Modèle existant vs nouveau modèle
+
+Les conventions de nommage s'appliquent **pleinement aux nouveaux modèles**. Sur un modèle **existant** (déjà publié, déjà utilisé) :
+
+- **Ne pas proposer de renommer les tables** (préfixes `Fact_` / `Dim_`…) sauf demande explicite : gain faible, risque élevé pour les rapports, les signets et les rapports connectés au modèle publié.
+- Avant de renommer une **mesure ou une colonne**, faire l'**inventaire des champs utilisés** par le rapport (`*.Report/`) et par les autres rapports connectés ; présenter l'impact.
+- Prioriser les corrections **sans impact visuel** : table de dates, `summarizeBy`, masquage, formats, descriptions, dossiers d'affichage.
+- Signaler les écarts de nommage dans l'audit, en **priorité basse**.
 
 ## Nommage — À ADAPTER
 
@@ -51,12 +61,19 @@ Règles générales :
 ## Descriptions et formats
 
 - **Toute mesure visible a une description** : définition métier, règle de calcul, source. Elle apparaît en info-bulle dans le volet Données.
+- Les mesures non triviales commencent par un **commentaire en trois lignes** :
+
+```dax
+// QUOI : CA HT de la période comparé à N-1, en %.
+// COMMENT : (N - N-1) / N-1 ; BLANK si pas de N.
+// ADAPTER : remplacer [CA HT] par la mesure de base.
+```
 - Formats : montants `#,##0 €` (**À ADAPTER** : devise HTG / USD / EUR), pourcentages `0.0 %`, entiers `#,##0`, dates `dd/MM/yyyy`.
 - Préférer des **chaînes de format dynamiques** aux mesures `FORMAT()` (qui renvoient du texte et cassent le tri et les totaux).
 
 ## Règles DAX minimales
 
-- `DIVIDE(a, b)` au lieu de `a / b`.
+- `DIVIDE(a, b)` au lieu de `a / b`. Attention : `DIVIDE(a, b, 0)` n'équivaut **pas** à `COALESCE(DIVIDE(a, b), 0)` — le 3ᵉ argument ne s'applique que si le dénominateur est nul ou vide ; si le numérateur est vide, `DIVIDE` renvoie BLANK. Ne pas remplacer l'un par l'autre sans vérifier l'intention. Préférer BLANK à 0 (voir `powerbi-performance`).
 - Variables (`VAR … RETURN`) dès qu'une expression est réutilisée ou pour la lisibilité.
 - Filtres de colonne dans `CALCULATE` plutôt que `FILTER(Table, …)` sur une table entière.
 - Pas d'`IFERROR` / `ISERROR` : traiter le cas en amont.
@@ -66,6 +83,17 @@ Règles générales :
 Détails et exemples : [references/checklist-revue.md](references/checklist-revue.md).
 
 ## Sécurité et gouvernance
+
+### Confidentialité des métadonnées
+
+Un projet PBIP ne contient pas les lignes de données, mais ses **métadonnées** sont envoyées au fournisseur d'IA dès qu'un agent les lit : noms de tables, colonnes, mesures et pages, logique DAX, titres, descriptions, rôles RLS (qui peuvent contenir des e-mails ou des noms), paramètres et chaînes de connexion.
+
+- **Avant d'ouvrir un projet réel avec un agent**, vérifier que l'outil est autorisé par l'organisation pour ce type de données — **impératif pour les données de santé ou personnelles**.
+- Préférer un **projet d'exemple** ou anonymisé pour expérimenter.
+- Ne jamais lire ni transmettre `.pbi/cache.abf` (données chargées) ni `.pbi/localSettings.json` ; vérifier qu'ils sont dans `.gitignore`.
+- Signaler à l'utilisateur, sans les recopier, les e-mails, noms de personnes ou secrets trouvés dans les rôles, paramètres ou expressions M.
+
+### Règles
 
 - RLS : rôles nommés `RLS_<périmètre>` (`RLS_Region`), filtres sur les dimensions, jamais sur les faits ; tester avec « Afficher en tant que ».
 - Ne jamais écrire d'identifiants, mots de passe ou chaînes de connexion en clair dans le modèle ou les paramètres.

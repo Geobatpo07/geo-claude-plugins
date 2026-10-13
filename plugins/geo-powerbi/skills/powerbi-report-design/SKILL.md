@@ -1,6 +1,6 @@
 ---
 name: powerbi-report-design
-description: "Charte graphique et règles de conception des rapports Power BI : thème JSON (couleurs, polices), grille et mise en page, structure des pages, choix du bon visuel, titres et libellés, segments, infobulles, navigation et accessibilité (contraste, texte alternatif, ordre de tabulation). À utiliser pour planifier, créer, revoir ou harmoniser un rapport ou une page Power BI, en complément de powerbi-report-cli (mécanique PBIR). Triggers: rapport, report, page, dashboard, tableau de bord, charte, thème, theme, couleurs, mise en page, layout, visuel, graphique, accessibilité, design, maquette."
+description: "Charte graphique et règles de conception des rapports Power BI : thème JSON (couleurs, polices), quatre questions par page, jetons de design (grille, cartes, couleurs), structure des pages, fonds SVG, références visuelles réutilisables, choix du bon visuel, titres et libellés, segments, infobulles, navigation et accessibilité (contraste, texte alternatif, ordre de tabulation). À utiliser pour planifier, créer, revoir ou harmoniser un rapport ou une page Power BI, en complément de powerbi-report-cli (mécanique PBIR). Triggers: rapport, report, page, dashboard, tableau de bord, charte, thème, theme, couleurs, mise en page, layout, visuel, graphique, accessibilité, design, maquette, fond de page, background, référence, revue de page."
 ---
 
 # Design des rapports
@@ -9,32 +9,56 @@ description: "Charte graphique et règles de conception des rapports Power BI : 
 
 ## Processus
 
-1. **Cadrer** : public, décisions à prendre, 3 à 5 questions auxquelles la page répond, fréquence de consultation.
-2. **Plan de pages** : une page = un sujet. Proposer la liste des pages et, pour chacune, un croquis de zones (texte ou Mermaid) **avant** de créer des visuels ; attendre la validation.
-3. **Appliquer le thème** [references/theme-geo.json](references/theme-geo.json) au rapport (Affichage → Thèmes → Parcourir).
-4. **Construire** en suivant la grille et les règles ci-dessous.
-5. **Contrôler** avec la checklist [references/checklist-accessibilite.md](references/checklist-accessibilite.md).
+1. **Quatre questions** : avant toute mise en page, écrire ce à quoi la page répond. Un visuel qui ne sert aucune question va sur une page de détail ou disparaît.
+   1. **Comment avons-nous performé ?** Le chiffre principal, en haut à gauche.
+   2. **Est-ce bien ?** Comparé à l'objectif et à N-1 — un chiffre sans comparaison ne dit rien.
+   3. **Pourquoi ?** Qui ou quoi l'explique : quel mois, quelle catégorie, quel client / établissement.
+   4. **Que faire ?** Le plus gros écart, où agir en premier (classement Bas / Haut).
+2. **Plan de pages** : une page = un sujet. Lister les pages et leurs quatre réponses ; attendre la validation.
+3. **Maquette HTML** de chaque page avec les champs réels du modèle → skill `powerbi-mockup`. Itérer sur la maquette (une phrase par changement) jusqu'à validation, **avant** de toucher au PBIP.
+4. **Références** : chercher dans [references/visuels/](references/visuels/README.md) un motif validé pour chaque visuel (cartes KPI, écarts, classements…) et le réutiliser.
+5. **Construire** dans le PBIP avec `powerbi-report-cli`, thème [references/theme-geo.json](references/theme-geo.json), jetons ci-dessous, fond SVG si besoin ([references/fonds-svg.md](references/fonds-svg.md)).
+6. **Vérifier visuellement** : recharger dans Desktop (changements externes ou Desktop Bridge), capture d'écran, corriger alignements, données et libellés ; recommencer jusqu'à conformité.
+7. **Contrôler** avec [references/checklist-accessibilite.md](references/checklist-accessibilite.md), puis **revue humaine** : chiffres contre la source. La validation des fichiers ne suffit pas.
+8. **Capitaliser** : chaque correction notable devient une nouvelle référence dans `references/visuels/`.
 
-## Structure type d'une page (canevas 1280 × 720)
+Pour revoir une page existante sans la modifier : lister les **5 plus gros problèmes** (alignement, couleur, hiérarchie visuelle, encombrement, libellés), classés par impact, avec une correction proposée pour chacun.
+
+## Jetons de design — À ADAPTER
+
+| Décision | Valeur |
+|---|---|
+| Canevas | 1280 × 720 (standard) ou 1300 × 900 (tableau de bord dense) |
+| Bande latérale (navigation, filtres) | 60 px, optionnelle |
+| Marge extérieure / espace entre cartes | 20 px / 16 px |
+| Cartes | fond blanc, rayon 12 px, bordure 1 px `#E5E7EB` |
+| Fond de page | `#F5F6F8` |
+| Couleur d'accent | **une seule** (`#1F4E79`) ; tout le reste en gris |
+| Bon / mauvais | `#2E7D32` / `#C62828`, uniquement pour un écart à une référence |
+| Texte titres / corps / discret | `#1F2933` / `#3C4650` / `#8A939B` |
+| Polices | Segoe UI Semibold (titres), Segoe UI (corps) — **deux tailles qui comptent** : 12 pt titres, 10 pt le reste ; KPI 28 pt |
+
+Ces valeurs doivent être identiques dans le thème, le fond SVG et la maquette HTML.
+
+## Structure type d'une page (lecture en Z)
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│ Titre de la page · période · logo             [navigation]   │  bandeau 56 px
-├──────────────────────────────────────────────────────────────┤
-│ KPI 1   │ KPI 2   │ KPI 3   │ KPI 4                          │  ligne KPI ~120 px
-├──────────────────────────────────────────────────────────────┤
-│ Tendance (courbe / colonnes)        │ Répartition (barres)   │  zone principale
-│                                     │                        │
-├─────────────────────────────────────┴────────────────────────┤
-│ Détail (table / matrice) ou visuel secondaire                │
-└──────────────────────────────────────────────────────────────┘
-Segments : bandeau horizontal sous le titre ou volet latéral repliable.
+┌────┬─────────────────────────────────────────────────────────┐
+│    │ Titre · période                [Plan | N-1]  [filtres] │
+│ N  ├──────────┬──────────┬──────────┬──────────────────────┤
+│ a  │ KPI 1 ★  │ KPI 2    │ KPI 3    │ KPI 4                │  Q1 + Q2
+│ v  ├──────────┴──────────┴──┬───────┴──────────────────────┤
+│    │ Tendance vs référence   │ Quels mois s'écartent ?      │  Q2 + Q3
+│    ├─────────────────────────┼──────────────────────────────┤
+│    │ Quels X sont en dessous?│ Quels Y sont en dessous ?    │  Q3 + Q4
+│    │ [Bas | Haut]            │ [Bas | Haut]                 │
+└────┴─────────────────────────┴──────────────────────────────┘
 ```
 
-- **Grille de 8 px**, marges extérieures 16 px, espacement entre visuels 16 px.
-- Lecture en **Z** : le plus important en haut à gauche ; détail en bas.
-- **6 à 8 visuels** maximum par page (hors formes et textes).
-- Alignement strict : mêmes hauteurs sur une ligne, mêmes largeurs dans une colonne.
+- Lecture en **Z** pour les tableaux de bord ; en **F** pour les pages surtout composées de tableaux et de texte.
+- **KPI le plus important en haut à gauche.** Même taille = même importance : différencier exprès, jamais par accident.
+- **Une page, plusieurs vues** : interrupteurs (Plan / N-1, Haut / Bas, Mensuel / Cumul) plutôt que des pages dupliquées → `powerbi-dax-library` (interrupteurs).
+- **6 à 8 visuels** maximum ; alignement strict sur la grille.
 
 ## Choisir le visuel
 
@@ -50,7 +74,7 @@ Segments : bandeau horizontal sous le titre ou volet latéral repliable.
 
 ## Règles de forme
 
-- **Titres de visuels = message ou question**, pas seulement le nom de la mesure (« CA mensuel vs N-1 »).
+- **Titres de visuels = question, avec la réponse** quand c'est possible (« Sommes-nous au-dessus de N-1 ? Non, 78 % »), via une mesure de titre dynamique.
 - Unité et période visibles (titre, sous-titre ou étiquette).
 - Trier les barres par valeur décroissante sauf ordre naturel (mois, tranches).
 - Axe des valeurs à partir de 0 pour les barres/colonnes.

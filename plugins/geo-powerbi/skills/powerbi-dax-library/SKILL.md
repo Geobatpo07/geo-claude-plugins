@@ -1,6 +1,6 @@
 ---
 name: powerbi-dax-library
-description: "Bibliothèque de mesures DAX standard : mesures de base, time intelligence (cumul annuel, N-1, évolution %, glissement 12 mois, moyenne mobile), marges, parts du total, classements, Top N, nouveaux clients, groupes de calcul et paramètres de champs. À utiliser pour écrire, compléter ou corriger des mesures DAX afin de réutiliser les modèles validés au lieu de réinventer les formules. Triggers: DAX, mesure, measure, YTD, cumul, N-1, YoY, évolution, variation, part, ratio, rang, RANKX, Top N, moyenne mobile, time intelligence, calculation group."
+description: "Bibliothèque de mesures DAX standard : mesures de base, time intelligence (cumul annuel, N-1, évolution %, glissement 12 mois, moyenne mobile), marges, parts du total, classements, Top N, nouveaux clients, groupes de calcul, paramètres de champs et interrupteurs par tables déconnectées (Plan/N-1, Haut/Bas, Mensuel/Cumul). À utiliser pour écrire, compléter ou corriger des mesures DAX afin de réutiliser les modèles validés au lieu de réinventer les formules. Triggers: DAX, mesure, measure, YTD, cumul, N-1, YoY, évolution, variation, part, ratio, rang, RANKX, Top N, moyenne mobile, time intelligence, calculation group, switch, table déconnectée, disconnected table, SELECTEDVALUE, titre dynamique."
 ---
 
 # Bibliothèque DAX
@@ -25,6 +25,7 @@ Appliquer `powerbi-conventions` (nommage, format, description) et `powerbi-perfo
 | Classements | Rang, Top N + Autres, ABC / Pareto | [classements](references/ratios-classements.md#classements) |
 | Clients | Clients actifs, nouveaux, perdus | [clients](references/ratios-classements.md#clients) |
 | Dynamique | Groupe de calcul temps, paramètre de champs, format dynamique | [time-intelligence](references/time-intelligence.md#groupe-de-calcul) |
+| Interrupteurs | Plan / N-1, Haut / Bas, Mensuel / Cumul via tables déconnectées, titres et couleurs dynamiques | [interrupteurs](references/interrupteurs.md) |
 
 ## Règles de la bibliothèque
 

@@ -12,7 +12,7 @@ Ce dépôt est une **marketplace Claude Code** (`geo-collection`) qui contient d
 
 ## Versionnement
 
-- Toute modification d'un skill ⇒ incrémenter `version` (SemVer) dans `plugins/<plugin>/.claude-plugin/plugin.json` **et** dans l'entrée correspondante de `.claude-plugin/marketplace.json`.
+- Toute modification d'un skill ⇒ incrémenter `version` (SemVer) dans `plugins/<plugin>/.claude-plugin/plugin.json`, puis `npm run generate` pour resynchroniser `.claude-plugin/marketplace.json` (sinon le workflow GitHub le fait après le push).
   - correctif / reformulation : patch (1.0.0 → 1.0.1)
   - nouveau skill ou nouvelle règle : mineur (1.0.1 → 1.1.0)
   - règle supprimée ou inversée : majeur (1.1.0 → 2.0.0)
