@@ -2,10 +2,7 @@
 
 Marketplace **Claude Code** de skills personnalisés pour **Power BI / Microsoft Fabric**.
 
-Ce dépôt **complète** [microsoft/skills-for-fabric](https://github.com/microsoft/skills-for-fabric) sans le modifier :
-
-- les skills Microsoft (`fabric-skills`, `powerbi-authoring`) s'installent depuis la source officielle et se mettent à jour automatiquement ;
-- nos règles maison (conventions, modélisation, DAX, design…) vivent ici, dans notre propre marketplace `geo-collection`.
+Ce dépôt regroupe nos règles maison pour Power BI et Fabric (conventions, modélisation, DAX, performance, design de rapports), sous forme de skills réutilisables dans Claude Code, publiés dans la marketplace `geo-collection`.
 
 > Les contenus marqués **« À ADAPTER »** sont des bonnes pratiques par défaut à remplacer par les règles réelles de l'équipe.
 
@@ -65,7 +62,7 @@ claude plugin install geo-powerbi@geo-collection
 Test local, avant de pousser sur GitHub :
 
 ```powershell
-claude plugin marketplace add "C:\Users\gblaguerre\Documents\Data Analytics Projects\geo-claude-plugins"
+claude plugin marketplace add ./geo-claude-plugins
 claude plugin install geo-powerbi@geo-collection
 ```
 
