@@ -17,6 +17,7 @@ Ce dépôt regroupe nos règles maison pour Power BI et Fabric (conventions, mod
 | | `powerbi-tmdl` | Lecture/écriture de modèles sémantiques au format TMDL (projets PBIP) |
 | | `powerbi-dax-library` | Bibliothèque de mesures standard (time intelligence, marges, parts, classements…) |
 | | `powerbi-performance` | Optimisation DAX et modèle (cardinalité, VertiPaq, Power Query, diagnostic) |
+| | `powerbi-lean` | Revue de diff, audit (inutilisés, doublons, valeurs en dur) et registre de dette ; script `lean.mjs` |
 | | `powerbi-mockup` | Maquette HTML d'une page à partir du modèle réel, avant de construire dans Power BI |
 | | `powerbi-report-design` | Charte des rapports : thème, mise en page, accessibilité, choix des visuels |
 | | `powerbi-html-visuals` | Visuels HTML/SVG générés en DAX (tableaux, cartes, sparklines, barres de progression) |
@@ -94,6 +95,7 @@ Sans incrément de version, Claude Code ne voit pas la mise à jour.
 | Modifier un modèle sémantique | `semantic-model-authoring` | `powerbi-conventions`, `powerbi-data-modeling`, `powerbi-tmdl` |
 | Écrire des mesures | `semantic-model-authoring` | `powerbi-dax-library`, `powerbi-performance` |
 | Créer / modifier un rapport | `powerbi-report-cli` | `powerbi-mockup`, `powerbi-report-design`, `powerbi-html-visuals` |
+| Revue / audit / nettoyage d'un projet PBIP | — | `powerbi-lean` |
 | Questions en langage naturel sur les données | `fabriciq` | — |
 
 Les skills Microsoft gèrent la **mécanique** (API Fabric, fichiers PBIR/PBIP, MCP) ; les nôtres imposent les **règles maison**. En cas de contradiction, nos conventions priment sur les choix de style, jamais sur les contraintes techniques des API.

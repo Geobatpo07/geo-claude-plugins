@@ -2,6 +2,12 @@
 
 Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) — versionnement [SemVer](https://semver.org/lang/fr/).
 
+## [1.2.0] — 2026-10-13
+
+### Ajouté
+- Skill `powerbi-lean` (« moins d'objets, pas moins de documentation ») : modes `review` (git diff), `audit` (projet complet) et `dette` (registre `DETTE.md` hors modèle). Alternative maison à ponytail, sans hook ni activation permanente.
+- Script `powerbi-lean/scripts/lean.mjs` (Node, sans dépendance, lecture seule) : audit TMDL + PBIR (inutilisés, doublons, valeurs en dur, FILTER sur table, summarizeBy, clés visibles, table de dates), option `--changed`, et `usage` pour l'inventaire des champs utilisés avant un renommage. Testé sur le projet d'exemple SalesCockpit.
+
 ## [1.1.0] — 2026-10-13
 
 Inspiré du guide « How I Build Power BI Reports with AI » (L. Reese).
