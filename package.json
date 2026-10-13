@@ -1,0 +1,10 @@
+{
+  "name": "solutions-claude-plugins",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Marketplace Claude Code de skills personnalisés pour Power BI / Fabric",
+  "scripts": {
+    "validate": "node scripts/validate.mjs"
+  },
+  "license": "UNLICENSED"
+}
