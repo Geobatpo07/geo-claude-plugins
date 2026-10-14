@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Skills Claude personnalisés pour Power BI / Microsoft Fabric, complémentaires de microsoft/skills-for-fabric.",
-    "version": "1.2.0"
+    "version": "1.3.0"
   },
   "plugins": [
     {
       "name": "geo-powerbi",
       "source": "./plugins/geo-powerbi",
       "description": "Conventions, modélisation, TMDL, DAX, performance, revue et audit (powerbi-lean), maquettes HTML, design de rapports et visuels HTML/SVG pour Power BI.",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "keywords": ["powerbi", "dax", "tmdl", "semantic-model", "data-modeling", "report-design", "mockup", "review", "audit", "svg", "html"]
     }
   ]

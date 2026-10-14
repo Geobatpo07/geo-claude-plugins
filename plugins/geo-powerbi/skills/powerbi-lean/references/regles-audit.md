@@ -1,4 +1,4 @@
-# Ce que vérifie `lean.mjs audit`
+# Ce que vérifie `lean.py audit`
 
 | Priorité | Catégorie | Règle |
 |---|---|---|

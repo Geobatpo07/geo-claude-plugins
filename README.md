@@ -17,7 +17,7 @@ Ce dépôt regroupe nos règles maison pour Power BI et Fabric (conventions, mod
 | | `powerbi-tmdl` | Lecture/écriture de modèles sémantiques au format TMDL (projets PBIP) |
 | | `powerbi-dax-library` | Bibliothèque de mesures standard (time intelligence, marges, parts, classements…) |
 | | `powerbi-performance` | Optimisation DAX et modèle (cardinalité, VertiPaq, Power Query, diagnostic) |
-| | `powerbi-lean` | Revue de diff, audit (inutilisés, doublons, valeurs en dur) et registre de dette ; script `lean.mjs` |
+| | `powerbi-lean` | Revue de diff, audit (inutilisés, doublons, valeurs en dur) et registre de dette ; script `lean.py` (Python) |
 | | `powerbi-mockup` | Maquette HTML d'une page à partir du modèle réel, avant de construire dans Power BI |
 | | `powerbi-report-design` | Charte des rapports : thème, mise en page, accessibilité, choix des visuels |
 | | `powerbi-html-visuals` | Visuels HTML/SVG générés en DAX (tableaux, cartes, sparklines, barres de progression) |
@@ -39,12 +39,12 @@ geo-claude-plugins/
 │               ├── SKILL.md      # instructions + frontmatter name/description
 │               └── references/   # détails chargés à la demande
 ├── templates/skill-template/     # squelette à copier
-├── scripts/validate.mjs          # contrôle de cohérence avant chaque push
+├── scripts/                      # Python : validate.py, generate_marketplace.py, bump_versions.py
 ├── CLAUDE.md / AGENTS.md         # règles pour éditer ce dépôt avec un agent
 └── CHANGELOG.md
 ```
 
-Chaque skill n'existe qu'à un seul endroit (`plugins/<plugin>/skills/`). La liste `plugins` de `marketplace.json` est **générée automatiquement** depuis les `plugin.json` (`npm run generate`) ; un workflow GitHub Actions (`.github/workflows/generate-marketplace.yml`), déclenché par le webhook `push` sur `main`, la régénère et la commit si elle a changé. L'en-tête (`name`, `owner`, `metadata`) reste édité à la main.
+Chaque skill n'existe qu'à un seul endroit (`plugins/<plugin>/skills/`). La liste `plugins` de `marketplace.json` est **générée automatiquement** depuis les `plugin.json` (`python scripts/generate_marketplace.py`) ; un workflow GitHub Actions (`.github/workflows/generate-marketplace.yml`), déclenché par le webhook `push` sur `main`, la régénère et la commit si elle a changé. L'en-tête (`name`, `owner`, `metadata`) reste édité à la main.
 
 ## Installation (Claude Code)
 
@@ -80,7 +80,7 @@ Activer la mise à jour automatique : dans Claude Code, `/plugin` → **Marketpl
 6. Valider puis publier :
 
 ```powershell
-npm run validate
+python scripts/validate.py
 git add .
 git commit -m "feat(powerbi): <résumé>"
 git push

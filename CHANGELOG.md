@@ -2,6 +2,18 @@
 
 Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) — versionnement [SemVer](https://semver.org/lang/fr/).
 
+## [1.3.0] — 2026-10-14
+
+### Modifié
+- `powerbi-lean` : le script d'audit passe de Node (`lean.mjs`) à **Python** (`lean.py`, 3.8+, bibliothèque standard uniquement). Mêmes commandes (`audit`, `usage`, `--changed`, `--field`, `--json`) et mêmes résultats, vérifiés sur le projet SalesCockpit et sur un jeu de test.
+- Sortie console forcée en UTF-8 (compatibilité Windows) ; ordre des résultats déterministe.
+
+- Scripts du dépôt passés en Python (bibliothèque standard) : `validate.py`, `generate_marketplace.py` (même sortie octet pour octet), `bump_versions.py` ; le workflow GitHub Actions utilise `setup-python`. Le dépôt ne contient plus que du Python et du Markdown.
+
+### Supprimé
+- `lean.mjs` (remplacé par `lean.py`).
+- `scripts/*.mjs` et `package.json` (remplacés par les scripts Python).
+
 ## [1.2.0] — 2026-10-13
 
 ### Ajouté

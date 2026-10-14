@@ -15,3 +15,7 @@ node_modules/
 # Secrets
 .env
 *.pem
+
+# Python
+__pycache__/
+*.pyc

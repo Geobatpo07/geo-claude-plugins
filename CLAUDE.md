@@ -12,12 +12,13 @@ Ce dépôt est une **marketplace Claude Code** (`geo-collection`) qui contient d
 
 ## Versionnement
 
-- Toute modification d'un skill ⇒ incrémenter `version` (SemVer) dans `plugins/<plugin>/.claude-plugin/plugin.json`, puis `npm run generate` pour resynchroniser `.claude-plugin/marketplace.json` (sinon le workflow GitHub le fait après le push).
+- Toute modification d'un skill ⇒ incrémenter `version` (SemVer) dans `plugins/<plugin>/.claude-plugin/plugin.json`, puis `python scripts/generate_marketplace.py` pour resynchroniser `.claude-plugin/marketplace.json` (sinon le workflow GitHub le fait après le push).
   - correctif / reformulation : patch (1.0.0 → 1.0.1)
   - nouveau skill ou nouvelle règle : mineur (1.0.1 → 1.1.0)
   - règle supprimée ou inversée : majeur (1.1.0 → 2.0.0)
 - Ajouter une entrée datée dans `CHANGELOG.md`.
-- Lancer `npm run validate` avant chaque commit.
+- Lancer `python scripts/validate.py` avant chaque commit.
+- Langages du dépôt : **Python** (scripts, bibliothèque standard uniquement, 3.8+) et **Markdown**. Pas de Node, pas de dépendance externe.
 
 ## Contenu
 
