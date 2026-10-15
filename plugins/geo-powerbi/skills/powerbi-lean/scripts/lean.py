@@ -4,6 +4,7 @@
 Usage :
   python lean.py audit <dossier PBIP | *.SemanticModel | fichier .pbip> [--changed] [--json]
   python lean.py usage <dossier PBIP> [--field "'Table'[Nom]" | --field "[Mesure]"] [--json]
+  python lean.py dette <dossier PBIP> [--json]   # état de DETTE.md + MODIFICATIONS.md
 
 Aucun fichier n'est modifié. Python 3.8+ ; bibliothèque standard uniquement.
 """
@@ -624,13 +625,154 @@ def print_usage(model, report, field, as_json):
             print(f"| {esc(r['page'])} | {esc(r['visual'])} | {esc(r['field'])} |")
 
 
+
+# ───────────────────────── dette & journal ─────────────────────────
+DEBT_ID = re.compile(r"\bD-\d{3,}\b")
+MOD_ID = re.compile(r"\bM-\d{3,}\b")
+DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+def field(body, name):
+    m = re.search(rf"\*\*{name}\*\*\s*:\s*([^\n·]+)", body, re.I)
+    return m.group(1).strip() if m else ""
+
+
+def parse_debt(path):
+    """DETTE.md : sections « ## Ouvert » / « ## Soldé », entrées « ### D-001 · titre »."""
+    items, section = [], None
+    if not os.path.isfile(path):
+        return items
+    text = read(path)
+    for block in re.split(r"(?m)^(?=#{2,3} )", text):
+        head = block.split("\n", 1)[0]
+        if head.startswith("## "):
+            low = head.lower()
+            section = "solde" if "sold" in low else ("ouvert" if "ouvert" in low else section)
+            continue
+        m = re.match(r"^### (D-\d{3,})\s*[·\-:]\s*(.*)$", head)
+        if not m:
+            continue
+        body = block.split("\n", 1)[1] if "\n" in block else ""
+        items.append({
+            "id": m.group(1), "title": m.group(2).strip(), "status": section or "ouvert",
+            "priority": field(body, "Priorité").lower() or "non précisée",
+            "due": (DATE.search(field(body, "Échéance")) or [None])[0] if field(body, "Échéance") else None,
+            "closed": (DATE.search(field(body, "Soldé le")) or [None])[0] if field(body, "Soldé le") else None,
+            "mods": MOD_ID.findall(field(body, "Modification")),
+        })
+    return items
+
+
+def parse_mods(path):
+    """MODIFICATIONS.md : entrées « ## M-001 · 2026-10-20 · titre » (plus récentes en haut)."""
+    mods = []
+    if not os.path.isfile(path):
+        return mods
+    for block in re.split(r"(?m)^(?=## )", read(path)):
+        head = block.split("\n", 1)[0]
+        m = re.match(r"^## (M-\d{3,})\s*[·\-:]\s*(.*)$", head)
+        if not m:
+            continue
+        body = block.split("\n", 1)[1] if "\n" in block else ""
+        d = DATE.search(m.group(2))
+        mods.append({"id": m.group(1), "date": d.group(0) if d else None,
+                     "title": DATE.sub("", m.group(2)).strip(" ·-:"),
+                     "debts": DEBT_ID.findall(field(body, "Dette")),
+                     "type": field(body, "Type")})
+    return mods
+
+
+def debt_report(root, today=None):
+    import datetime
+    today = today or datetime.date.today().isoformat()
+    debts = parse_debt(os.path.join(root, "DETTE.md"))
+    mods = parse_mods(os.path.join(root, "MODIFICATIONS.md"))
+    by_id = {d["id"]: d for d in debts}
+    open_ = [d for d in debts if d["status"] == "ouvert"]
+    closed = [d for d in debts if d["status"] == "solde"]
+    mod_ids = {m["id"] for m in mods}
+    debts_in_mods = {x for m in mods for x in m["debts"]}
+    issues = []
+    for d in open_:
+        if d["due"] and d["due"] < today:
+            issues.append(f"{d['id']} : échéance dépassée ({d['due']})")
+        if d["id"] in debts_in_mods:
+            issues.append(f"{d['id']} : citée dans MODIFICATIONS.md mais encore « Ouvert » dans DETTE.md")
+    for d in closed:
+        if not d["mods"] and d["id"] not in debts_in_mods:
+            issues.append(f"{d['id']} : soldée sans modification liée dans MODIFICATIONS.md")
+        for mid in d["mods"]:
+            if mid not in mod_ids:
+                issues.append(f"{d['id']} : renvoie à {mid}, absente de MODIFICATIONS.md")
+    for m in mods:
+        for did in m["debts"]:
+            if did not in by_id:
+                issues.append(f"{m['id']} : cite {did}, absente de DETTE.md")
+    ids = [int(m["id"][2:]) for m in mods]
+    if len(ids) != len(set(ids)):
+        issues.append("MODIFICATIONS.md : identifiants M-xxx en double")
+    prio = {}
+    for d in open_:
+        prio[d["priority"]] = prio.get(d["priority"], 0) + 1
+    total = len(debts)
+    return {
+        "today": today, "total": total, "open": len(open_), "closed": len(closed),
+        "progress": round(100 * len(closed) / total) if total else None,
+        "openByPriority": prio, "modifications": len(mods),
+        "lastModification": mods[0] if mods else None,
+        "nextId": {"dette": f"D-{max([int(d['id'][2:]) for d in debts] or [0]) + 1:03d}",
+                   "modification": f"M-{max(ids or [0]) + 1:03d}"},
+        "openItems": [{k: d[k] for k in ("id", "title", "priority", "due")} for d in open_],
+        "issues": issues,
+    }
+
+
+def print_debt(rep, root):
+    print("# Dette et modifications\n")
+    print(f"Projet : {root}\n")
+    if not rep["total"] and not rep["modifications"]:
+        print("Ni DETTE.md ni MODIFICATIONS.md trouvés à la racine du projet.")
+        return
+    bar = ""
+    if rep["progress"] is not None:
+        filled = rep["progress"] // 5
+        bar = "█" * filled + "░" * (20 - filled)
+    print(f"| Dette | Valeur |\n|---|---|")
+    print(f"| Entrées | {rep['total']} |\n| Ouvertes | {rep['open']} |\n| Soldées | {rep['closed']} |")
+    if rep["progress"] is not None:
+        print(f"| Progression | {bar} {rep['progress']} % |")
+    print(f"| Modifications journalisées | {rep['modifications']} |\n")
+    if rep["openByPriority"]:
+        print("Ouvertes par priorité : " + ", ".join(f"{k} {v}" for k, v in sorted(rep["openByPriority"].items())) + "\n")
+    if rep["lastModification"]:
+        lm = rep["lastModification"]
+        print(f"Dernière modification : {lm['id']} · {lm['date'] or '?'} · {lm['title']}\n")
+    print(f"Prochains identifiants : {rep['nextId']['dette']} (dette), {rep['nextId']['modification']} (modification)\n")
+    if rep["issues"]:
+        print("## Incohérences\n")
+        for i in rep["issues"]:
+            print(f"- {i}")
+    else:
+        print("Aucune incohérence entre DETTE.md et MODIFICATIONS.md.")
+
+
 # ───────────────────────── main ─────────────────────────
 def main(argv):
-    if not argv or argv[0] not in ("audit", "usage"):
-        print('Usage : python lean.py audit|usage <dossier PBIP> [--changed] [--field "Table[Nom]"] [--json]')
+    if not argv or argv[0] not in ("audit", "usage", "dette"):
+        print('Usage : python lean.py audit|usage|dette <dossier PBIP> [--changed] [--field "Table[Nom]"] [--json]')
         return 0 if not argv else 1
     cmd, rest = argv[0], argv[1:]
     target = rest[0] if rest and not rest[0].startswith("--") else "."
+    if cmd == "dette":
+        root = os.path.dirname(os.path.abspath(target)) if target.endswith(".pbip") else os.path.abspath(target)
+        if root.endswith((".SemanticModel", ".Report")):
+            root = os.path.dirname(root)
+        rep = debt_report(root)
+        if "--json" in rest:
+            print(json.dumps(rep, ensure_ascii=False, indent=2))
+        else:
+            print_debt(rep, root)
+        return 0
     field = rest[rest.index("--field") + 1] if "--field" in rest and rest.index("--field") + 1 < len(rest) else None
     loc = locate(target)
     model = load_model(loc["model"])

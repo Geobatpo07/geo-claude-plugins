@@ -17,7 +17,7 @@ Ce dépôt regroupe nos règles maison pour Power BI et Fabric (conventions, mod
 | | `powerbi-tmdl` | Lecture/écriture de modèles sémantiques au format TMDL (projets PBIP) |
 | | `powerbi-dax-library` | Bibliothèque de mesures standard (time intelligence, marges, parts, classements…) |
 | | `powerbi-performance` | Optimisation DAX et modèle (cardinalité, VertiPaq, Power Query, diagnostic) |
-| | `powerbi-lean` | Revue de diff, audit (inutilisés, doublons, valeurs en dur) et registre de dette ; script `lean.py` (Python) |
+| | `powerbi-lean` | Revue de diff, audit (inutilisés, doublons, valeurs en dur), registre `DETTE.md` et journal `MODIFICATIONS.md` ; script `lean.py` (Python) |
 | | `powerbi-mockup` | Maquette HTML d'une page à partir du modèle réel, avant de construire dans Power BI |
 | | `powerbi-report-design` | Charte des rapports : thème, mise en page, accessibilité, choix des visuels |
 | | `powerbi-html-visuals` | Visuels HTML/SVG générés en DAX (tableaux, cartes, sparklines, barres de progression) |

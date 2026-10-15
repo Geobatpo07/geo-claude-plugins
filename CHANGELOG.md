@@ -2,6 +2,15 @@
 
 Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) — versionnement [SemVer](https://semver.org/lang/fr/).
 
+## [1.4.0] — 2026-10-15
+
+### Ajouté
+- `powerbi-lean` : journal **`MODIFICATIONS.md`** (modèle `modele-modifications.md`) qui se remplit à mesure que la dette diminue ; procédure « solder une dette » (entrée M-xxx, déplacement de D-xxx dans « Soldé », commit `M-xxx: …`).
+- `lean.py dette` : état de la dette (ouvertes / soldées, progression, priorités, échéances dépassées), prochains identifiants D-xxx / M-xxx et contrôle de cohérence entre `DETTE.md` et `MODIFICATIONS.md`.
+
+### Modifié
+- `modele-dette.md` : une dette soldée renvoie à sa modification (`**Modification** : M-xxx`) au lieu d'un hash de commit.
+
 ## [1.3.0] — 2026-10-14
 
 ### Modifié

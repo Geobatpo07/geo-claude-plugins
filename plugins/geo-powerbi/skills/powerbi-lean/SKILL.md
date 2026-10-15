@@ -1,6 +1,6 @@
 ---
 name: powerbi-lean
-description: "Sobriété et revue des modèles et rapports Power BI : moins d'objets, pas moins de documentation. Trois modes : review (revue du git diff d'un projet PBIP), audit (mesures et colonnes inutilisées, doublons DAX, valeurs en dur, FILTER sur table entière, summarizeBy, clés visibles, table de dates) et dette (registre DETTE.md des raccourcis assumés). Inclut un script Python en lecture seule (lean.py) qui inventorie aussi les champs utilisés par le rapport avant un renommage. Triggers: revue, review, audit, nettoyage, simplifier, inutilisé, unused, doublon, duplicate, dette technique, tech debt, refactoriser, avant renommage, où est utilisée cette mesure, impact."
+description: "Sobriété et revue des modèles et rapports Power BI : moins d'objets, pas moins de documentation. Trois modes : review (revue du git diff d'un projet PBIP), audit (mesures et colonnes inutilisées, doublons DAX, valeurs en dur, FILTER sur table entière, summarizeBy, clés visibles, table de dates) et dette (registre DETTE.md des raccourcis assumés et journal MODIFICATIONS.md qui se remplit à mesure que la dette diminue). Inclut un script Python en lecture seule (lean.py) qui inventorie aussi les champs utilisés par le rapport avant un renommage. Triggers: revue, review, audit, journal des modifications, changelog, solder une dette, progression de la dette, nettoyage, simplifier, inutilisé, unused, doublon, duplicate, dette technique, tech debt, refactoriser, avant renommage, où est utilisée cette mesure, impact."
 ---
 
 # powerbi-lean — moins d'objets, pas moins de documentation
@@ -19,6 +19,7 @@ python "<dossier du skill>/scripts/lean.py" audit "<dossier>" --changed         
 python "<dossier du skill>/scripts/lean.py" usage "<dossier>"                            # champs utilisés par page / visuel
 python "<dossier du skill>/scripts/lean.py" usage "<dossier>" --field "'Table'[Colonne]" # où un champ est utilisé
 python "<dossier du skill>/scripts/lean.py" usage "<dossier>" --field "[Mesure]"
+python "<dossier du skill>/scripts/lean.py" dette "<dossier>"                            # état DETTE.md + MODIFICATIONS.md
 ```
 
 Ajouter `--json` pour une sortie exploitable. Sous Windows, utiliser `python` (ou `py`) ; ailleurs `python3`. Le dossier peut être celui du `.pbip`, du `*.SemanticModel` ou le fichier `.pbip`. Ce que le script vérifie et ses limites : [references/regles-audit.md](references/regles-audit.md).
@@ -48,14 +49,24 @@ Quand : prise en main d'un modèle, avant une refonte, avant publication.
    - **Renommages** en dernier, avec l'inventaire `usage` de chaque objet.
 4. Proposer de consigner dans `DETTE.md` ce qui ne sera pas corrigé tout de suite.
 
-## Mode `dette` — registre des raccourcis
+## Mode `dette` — registre des raccourcis et journal des modifications
 
-Un raccourci assumé (valeur en dur temporaire, mesure dupliquée en attendant une refonte, contournement d'un problème de source) est consigné dans **`DETTE.md` à la racine du projet**, à côté du `.pbip` — **jamais en commentaire dans le modèle publié**.
+Deux fichiers à la racine du projet, à côté du `.pbip`, versionnés avec lui — **jamais en commentaire dans le modèle publié** :
 
-- Ajouter : une entrée par raccourci avec le modèle [references/modele-dette.md](references/modele-dette.md).
-- Lister : lire `DETTE.md`, regrouper par priorité et échéance, signaler les échéances dépassées.
-- Solder : quand le raccourci est corrigé, déplacer l'entrée dans « Soldé » avec la date et le commit.
-- À la fin d'un `audit`, proposer d'ajouter les constats non traités.
+| Fichier | Rôle | Modèle |
+|---|---|---|
+| `DETTE.md` | Ce qui reste à corriger (raccourcis assumés, constats d'audit non traités) | [modele-dette.md](references/modele-dette.md) |
+| `MODIFICATIONS.md` | Ce qui a été corrigé ou ajouté, plus récent en haut ; se remplit à mesure que la dette diminue | [modele-modifications.md](references/modele-modifications.md) |
+
+- **État** : `python "<dossier du skill>/scripts/lean.py" dette "<dossier du projet>"` → dettes ouvertes / soldées, progression, priorités, échéances dépassées, prochains identifiants (D-xxx, M-xxx) et incohérences entre les deux fichiers.
+- **Ajouter une dette** : nouvelle entrée `D-xxx` dans « Ouvert » ; à la fin d'un `audit`, proposer d'y consigner les constats non traités.
+- **Solder une dette** (après correction **et** vérification) :
+  1. ajouter en haut de `MODIFICATIONS.md` une entrée `M-xxx` : dette(s) soldée(s), type, objets modifiés, avant → après, impact sur le rapport, vérification (sans valeurs réelles) ;
+  2. déplacer l'entrée `D-xxx` de « Ouvert » vers « Soldé » avec `**Soldé le**` et `**Modification** : M-xxx` ;
+  3. relancer `lean.py dette` : aucune incohérence attendue ;
+  4. un seul commit pour le changement et les deux fichiers, message `M-xxx: <résumé>`.
+- **Évolution hors dette** (nouvelle page, nouvelle mesure) : entrée `M-xxx` avec `**Dette** : hors dette`.
+- Ne jamais solder une dette sans entrée de journal, ni écrire une entrée de journal sans avoir vérifié les valeurs.
 
 ## Règles
 

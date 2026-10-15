@@ -18,7 +18,7 @@
 ## Soldé
 
 ### D-000 · Exemple soldé
-- **Soldé le** : 2026-10-20 · **Commit** : abc1234
+- **Soldé le** : 2026-10-20 · **Modification** : M-001
 ```
 
-Règles : un identifiant par entrée (D-001…), une ligne « pourquoi » obligatoire, une échéance réaliste. Ne jamais recopier de données (valeurs patients, noms) dans ce fichier.
+Règles : un identifiant par entrée (D-001…, prochain numéro donné par `python lean.py dette <projet>`), une ligne « pourquoi » obligatoire, une échéance réaliste. Une entrée soldée renvoie toujours à son entrée de `MODIFICATIONS.md` ([modèle](modele-modifications.md)). Ne jamais recopier de données (valeurs patients, noms) dans ce fichier.
