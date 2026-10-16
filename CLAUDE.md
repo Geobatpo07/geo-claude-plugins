@@ -10,6 +10,10 @@ Ce dépôt est une **marketplace Claude Code** (`geo-collection`) qui contient d
 - Un skill ne référence **jamais** un fichier hors de son plugin : seul le dossier du plugin est copié à l'installation.
 - Pas de doublon de contenu entre skills : renvoyer vers le skill qui fait foi (ex. « appliquer `powerbi-conventions` »).
 
+## Documentation
+
+- Tout skill ajouté, renommé ou modifié dans son usage doit être reflété dans `plugins/<plugin>/commands/<plugin>-docs.md` (sections `skills` et `exemples`). `validate.py` refuse un skill absent du guide.
+
 ## Versionnement
 
 - Toute modification d'un skill ⇒ incrémenter `version` (SemVer) dans `plugins/<plugin>/.claude-plugin/plugin.json`, puis `python scripts/generate_marketplace.py` pour resynchroniser `.claude-plugin/marketplace.json` (sinon le workflow GitHub le fait après le push).

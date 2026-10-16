@@ -629,6 +629,7 @@ def print_usage(model, report, field, as_json):
 # ───────────────────────── dette & journal ─────────────────────────
 DEBT_ID = re.compile(r"\bD-\d{3,}\b")
 MOD_ID = re.compile(r"\bM-\d{3,}\b")
+DEBT_REF = re.compile(r"\b(D-\d{3,})\b(?:\s*\((partielle?|en cours)\))?", re.I)
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 
@@ -677,7 +678,8 @@ def parse_mods(path):
         d = DATE.search(m.group(2))
         mods.append({"id": m.group(1), "date": d.group(0) if d else None,
                      "title": DATE.sub("", m.group(2)).strip(" ·-:"),
-                     "debts": DEBT_ID.findall(field(body, "Dette")),
+                     "debts": [d for d, mark in DEBT_REF.findall(field(body, "Dette")) if not mark],
+                     "partial": [d for d, mark in DEBT_REF.findall(field(body, "Dette")) if mark],
                      "type": field(body, "Type")})
     return mods
 
@@ -705,7 +707,7 @@ def debt_report(root, today=None):
             if mid not in mod_ids:
                 issues.append(f"{d['id']} : renvoie à {mid}, absente de MODIFICATIONS.md")
     for m in mods:
-        for did in m["debts"]:
+        for did in m["debts"] + m["partial"]:
             if did not in by_id:
                 issues.append(f"{m['id']} : cite {did}, absente de DETTE.md")
     ids = [int(m["id"][2:]) for m in mods]

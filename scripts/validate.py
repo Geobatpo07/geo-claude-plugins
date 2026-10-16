@@ -62,6 +62,14 @@ def main():
                 if manifest.get("version") != p.get("version"):
                     errors.append(f"{label} : version marketplace ({p.get('version')}) ≠ plugin.json "
                                   f"({manifest.get('version')})")
+            docs_cmds = [os.path.join(pdir, "commands", f) for f in sorted(os.listdir(os.path.join(pdir, "commands")))
+                         if f.endswith("-docs.md")] if os.path.isdir(os.path.join(pdir, "commands")) else []
+            docs_text = "".join(open(f, encoding="utf-8-sig").read() for f in docs_cmds)
+            if os.path.isdir(os.path.join(pdir, "commands")):
+                for cf in sorted(os.listdir(os.path.join(pdir, "commands"))):
+                    if cf.endswith(".md") and parse_frontmatter(open(os.path.join(pdir, "commands", cf),
+                                                                      encoding="utf-8-sig").read()) is None:
+                        errors.append(f"{label} : commande {cf} sans frontmatter (description)")
             skills_dir = os.path.join(pdir, "skills")
             if not os.path.isdir(skills_dir):
                 warnings.append(f"{label} : aucun dossier skills/")
@@ -94,6 +102,8 @@ def main():
                 lines = len(text.splitlines())
                 if lines > 300:
                     warnings.append(f"{slabel} : {lines} lignes (> 300, déplacer vers references/)")
+                if docs_cmds and f"`{s}`" not in docs_text:
+                    errors.append(f"{slabel} : absent de la commande de documentation ({os.path.basename(docs_cmds[0])})")
                 for ref in re.findall(r"\]\((references/[^)#\s]+)\)", text):
                     if not os.path.exists(os.path.join(sdir, ref)):
                         errors.append(f"{slabel} : lien cassé {ref}")

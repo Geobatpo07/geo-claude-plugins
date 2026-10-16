@@ -22,6 +22,8 @@ Ce dépôt regroupe nos règles maison pour Power BI et Fabric (conventions, mod
 | | `powerbi-report-design` | Charte des rapports : thème, mise en page, accessibilité, choix des visuels |
 | | `powerbi-html-visuals` | Visuels HTML/SVG générés en DAX (tableaux, cartes, sparklines, barres de progression) |
 
+Guide d'utilisation intégré : dans Claude Code, tapez **`/geo-powerbi-docs`** (ou `/geo-powerbi-docs <section>` : installation, skills, exemples, lean, dette, methode, securite, depannage).
+
 Modèle pour créer un nouveau skill : [`templates/skill-template/`](templates/skill-template/).
 
 ## Structure
@@ -34,6 +36,8 @@ geo-claude-plugins/
 │   └── geo-powerbi/
 │       ├── .claude-plugin/
 │       │   └── plugin.json       # manifeste du plugin (version !)
+│       ├── commands/
+│       │   └── geo-powerbi-docs.md  # commande /geo-powerbi-docs (guide)
 │       └── skills/
 │           └── <nom-du-skill>/
 │               ├── SKILL.md      # instructions + frontmatter name/description

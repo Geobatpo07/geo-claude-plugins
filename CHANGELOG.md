@@ -2,6 +2,18 @@
 
 Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) — versionnement [SemVer](https://semver.org/lang/fr/).
 
+## [1.5.0] — 2026-10-16
+
+### Ajouté
+- Commande **`/geo-powerbi-docs [section]`** : guide d'utilisation du plugin (installation, skills, exemples de demandes, `lean.py`, dette et journal, méthode, sécurité, dépannage) pour tout nouvel utilisateur.
+- `validate.py` : vérifie que chaque skill est présenté dans la commande de documentation et que chaque commande a un frontmatter.
+
+## [1.4.1] — 2026-10-16
+
+### Ajouté
+- `powerbi-lean` : procédure d'initialisation de `MODIFICATIONS.md` sur un projet qui a déjà une dette (reprise de l'historique Git, sans invention).
+- Référence `D-xxx (partielle)` / `(en cours)` dans le journal : avancée qui ne solde pas la dette, acceptée par `lean.py dette`.
+
 ## [1.4.0] — 2026-10-15
 
 ### Ajouté

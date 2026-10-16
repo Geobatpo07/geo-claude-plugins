@@ -66,6 +66,8 @@ Deux fichiers à la racine du projet, à côté du `.pbip`, versionnés avec lui
   3. relancer `lean.py dette` : aucune incohérence attendue ;
   4. un seul commit pour le changement et les deux fichiers, message `M-xxx: <résumé>`.
 - **Évolution hors dette** (nouvelle page, nouvelle mesure) : entrée `M-xxx` avec `**Dette** : hors dette`.
+- **Avancée partielle** : `**Dette** : D-xxx (partielle)`, la dette reste ouverte.
+- **Projet qui a déjà une dette mais pas de journal** : reconstituer `MODIFICATIONS.md` depuis `git log` et `DETTE.md`, sans rien inventer — procédure dans [modele-modifications.md](references/modele-modifications.md#initialiser-le-journal-sur-un-projet-qui-a-déjà-une-dette).
 - Ne jamais solder une dette sans entrée de journal, ni écrire une entrée de journal sans avoir vérifié les valeurs.
 
 ## Règles
