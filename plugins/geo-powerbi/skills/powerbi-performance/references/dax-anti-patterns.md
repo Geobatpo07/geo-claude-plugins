@@ -112,6 +112,6 @@ Moyenne CA par client =
 AVERAGEX ( VALUES ( Dim_Client[CustomerKey] ), [CA HT] )
 ```
 
-## 7. SWITCH sur des mesures lourdes
+## 7. SWITCH pour sélectionner une mesure
 
-`SWITCH ( TRUE (), … )` peut évaluer plusieurs branches. Pour sélectionner une mesure selon un segment, préférer un **paramètre de champs** ou un **groupe de calcul**.
+`SWITCH` s'arrête à la première valeur qui correspond : les branches suivantes ne sont pas évaluées (l'ordre des conditions compte). Ce n'est donc pas un problème de performance. Pour sélectionner une mesure selon un segment, un **paramètre de champs** ou un **groupe de calcul** reste préférable pour l'**ergonomie** (pas de formule à maintenir à chaque nouvel indicateur), pas pour la vitesse.
