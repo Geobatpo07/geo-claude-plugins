@@ -57,7 +57,7 @@ Détails et seuils : [references/modele-power-query.md](references/modele-power-
 
 ## Rapports
 
-- ≤ 8–10 visuels par page ; regrouper les KPI dans un seul visuel carte multi-lignes quand c'est possible.
+- Au plus 8 visuels par page (heuristique maison, pas une règle Microsoft) ; regrouper les KPI dans un seul visuel carte multi-lignes quand c'est possible.
 - Limiter les segments synchronisés et les interactions inutiles (*Modifier les interactions*).
 - Éviter les tables/matrices avec des dizaines de milliers de lignes visibles.
 - Infobulles de rapport : légères (elles exécutent leurs propres requêtes).

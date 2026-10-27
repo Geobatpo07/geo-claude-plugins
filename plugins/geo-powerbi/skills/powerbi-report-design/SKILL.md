@@ -58,7 +58,7 @@ Ces valeurs doivent être identiques dans le thème, le fond SVG et la maquette 
 - Lecture en **Z** pour les tableaux de bord ; en **F** pour les pages surtout composées de tableaux et de texte.
 - **KPI le plus important en haut à gauche.** Même taille = même importance : différencier exprès, jamais par accident.
 - **Une page, plusieurs vues** : interrupteurs (Plan / N-1, Haut / Bas, Mensuel / Cumul) plutôt que des pages dupliquées → `powerbi-dax-library` (interrupteurs).
-- **6 à 8 visuels** maximum ; alignement strict sur la grille.
+- **6 à 8 visuels** maximum (heuristique maison, pas une règle Microsoft) ; alignement strict sur la grille.
 
 ## Choisir le visuel
 
