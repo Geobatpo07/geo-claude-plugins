@@ -2,6 +2,26 @@
 
 Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) — versionnement [SemVer](https://semver.org/lang/fr/).
 
+## [1.5.1] — 2026-10-27
+
+### Corrigé
+- `powerbi-tmdl`, `powerbi-report-design`, `/geo-powerbi-docs` : le **rechargement des changements externes** (préversion, Desktop d'août 2026 ou plus récent, option *Detect and reload external PBIP changes*) et le **Desktop Bridge** (Options → Sécurité, activé par défaut ; la doc le signale aussi comme préversion) sont désormais deux mécanismes distincts.
+- `powerbi-data-modeling`, `powerbi-performance` : **Direct Lake on OneLake** (recommandé pour les nouveaux modèles ; pas de repli DirectQuery, composite possible, colonnes calculées en contexte utilisateur en préversion, garde-fous dépassés = requête en erreur) distingué de **Direct Lake on SQL analytics endpoint** (repli DirectQuery, `DirectLakeBehavior`).
+- `powerbi-performance` : `SWITCH` s'arrête à la première valeur qui correspond ; le conseil paramètre de champs / groupe de calcul relève de l'ergonomie, pas de la performance.
+- Nombre de visuels par page aligné : 6 à 8 (`powerbi-report-design`) et au plus 8 (`powerbi-performance`), présenté comme heuristique maison.
+- `powerbi-dax-library` : moyenne mobile 3 mois (`CALCULATE` autour d'`AVERAGEX`, comportement des mois vides documenté) ; `_dateMax` remplacé par `_Date max ventes` ; Nouveaux clients / Clients perdus via `SUMMARIZE` sur `CustomerCode` (SCD2) ; Part dans la catégorie sur tous les niveaux sous la catégorie ; ajout de `CA HT YTD fiscal`.
+- `powerbi-performance` (anti-patterns §2 et §6) : `CustomerCode` au lieu de `CustomerKey`, avec note SCD2.
+- `powerbi-data-modeling` (`dim-date.md`) : bornes de la table de dates calculées sur `DateCommande` et `DateLivraison`.
+
+### À valider
+Aucun moteur DAX n'était disponible (ni Tabular Editor CLI, ni DAX Studio, ni serveur MCP de modélisation) : ces mesures n'ont **pas** été exécutées.
+- `CA HT moyenne mobile 3 mois` (`time-intelligence.md`)
+- `CA HT YTD fiscal` (`time-intelligence.md`)
+- `Nouveaux clients`, `Clients perdus` (`ratios-classements.md`)
+- `Part dans la catégorie %` (`ratios-classements.md`)
+- `CA gros clients` et `Moyenne CA par client` (`dax-anti-patterns.md`)
+- `Dim_Date` en DAX avec `DateLivraison` (`dim-date.md`)
+
 ## [1.5.0] — 2026-10-16
 
 ### Ajouté
