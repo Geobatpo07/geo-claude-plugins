@@ -43,7 +43,8 @@ Livrer la conception sous forme de tableau **table / type / grain / clé / relat
 | Mode | Quand | Points d'attention |
 |---|---|---|
 | **Import** | Par défaut ; volumes jusqu'à quelques centaines de millions de lignes | Planifier l'actualisation ; actualisation incrémentielle sur les gros faits |
-| **Direct Lake** (Fabric) | Données déjà en Delta dans un Lakehouse/Warehouse Fabric | Tables Delta optimisées (V-Order), pas de colonnes calculées ; repli DirectQuery possible |
+| **Direct Lake on OneLake** (Fabric) — recommandé pour les nouveaux modèles | Données déjà en Delta dans un Lakehouse/Warehouse Fabric | Tables Delta optimisées (V-Order) ; **pas de repli DirectQuery** ; modèle composite possible (tables Import) ; colonnes calculées en contexte utilisateur uniquement (préversion) ; pas de vue SQL non matérialisée ; garde-fous de capacité dépassés = requête en erreur |
+| **Direct Lake on SQL analytics endpoint** (Fabric) | Idem, source unique, quand le point de terminaison SQL est nécessaire | **Repli DirectQuery** si vue SQL, RLS/OLS/DDM du point de terminaison ou garde-fous dépassés ; pas de colonnes calculées ; contrôle par la propriété `DirectLakeBehavior` (Automatic, DirectLakeOnly, DirectQueryOnly) |
 | **DirectQuery** | Temps réel strict ou volumes impossibles à importer | Performances dépendantes de la source ; limiter les visuels ; agrégations |
 | **Composite** | Mélange (faits en DirectQuery + dimensions en Dual) | Dimensions en mode **Dual** |
 

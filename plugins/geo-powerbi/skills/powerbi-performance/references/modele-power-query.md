@@ -35,8 +35,10 @@
 ## Direct Lake (Fabric)
 
 - Optimiser les tables Delta : V-Order, `OPTIMIZE`, taille de fichiers raisonnable, peu de petits fichiers.
-- Éviter les vues SQL dans le modèle (provoquent un repli DirectQuery).
-- Surveiller le repli DirectQuery et les limites de garde-fous de la capacité (lignes, taille).
+- Préférer **Direct Lake on OneLake** pour les nouveaux modèles : pas de repli DirectQuery, pas de dépendance au point de terminaison SQL.
+- Éviter les vues SQL non matérialisées : sur OneLake elles ne sont pas prises en charge ; sur le point de terminaison SQL elles provoquent un repli DirectQuery. Matérialiser la vue en table Delta.
+- Surveiller les garde-fous de la capacité (fichiers Parquet, groupes de lignes, lignes) : sur le point de terminaison SQL, leur dépassement provoque un repli DirectQuery (propriété `DirectLakeBehavior`) ; sur OneLake, la requête échoue (les visuels ne s'affichent pas).
+- Repli sur le point de terminaison SQL : `EVALUATE TABLETRAITS ()` donne la cause par table dans la colonne `DirectLakeFallbackInfo` (`None` = Direct Lake).
 
 ## DirectQuery
 
