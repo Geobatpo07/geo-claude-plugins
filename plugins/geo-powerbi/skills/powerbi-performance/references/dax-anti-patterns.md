@@ -38,9 +38,11 @@ Après (le seuil s'applique par client, sur la colonne de la dimension) :
 CA gros clients =
 CALCULATE (
     [CA HT],
-    FILTER ( VALUES ( Dim_Client[CustomerKey] ), [CA HT] > 10000 )
+    FILTER ( VALUES ( Dim_Client[CustomerCode] ), [CA HT] > 10000 )
 )
 ```
+
+Si la dimension est en **SCD2**, filtrer sur la clé métier `CustomerCode` (une ligne par client), pas sur la clé de substitution `CustomerKey` (une ligne par version). **À tester.**
 
 ## 3. Expressions répétées
 
@@ -109,8 +111,10 @@ Après (itère les clients) :
 
 ```dax
 Moyenne CA par client =
-AVERAGEX ( VALUES ( Dim_Client[CustomerKey] ), [CA HT] )
+AVERAGEX ( VALUES ( Dim_Client[CustomerCode] ), [CA HT] )
 ```
+
+Si la dimension est en **SCD2**, itérer sur `CustomerCode` (clé métier) : avec `CustomerKey`, un client à plusieurs versions compterait plusieurs fois. **À tester.**
 
 ## 7. SWITCH pour sélectionner une mesure
 

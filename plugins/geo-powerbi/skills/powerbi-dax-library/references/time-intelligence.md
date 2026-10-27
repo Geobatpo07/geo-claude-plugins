@@ -21,6 +21,18 @@ IF (
 )
 ```
 
+Exercice fiscal (ex. fin au 30 septembre) : même borne « pas de futur », date de fin d'exercice en second argument. **À tester.**
+
+```dax
+CA HT YTD fiscal =
+IF (
+    MIN ( Dim_Date[Date] ) <= [_Date max ventes],
+    CALCULATE ( [CA HT], DATESYTD ( Dim_Date[Date], "9/30" ) )
+)
+```
+
+Le format de la date de fin (`"9/30"`, mois/jour) dépend de la langue du modèle. Voir la section « Exercice fiscal » de `powerbi-data-modeling/references/dim-date.md`, ou piloter la date par une mesure de paramètre.
+
 ```dax
 CA HT QTD =
 CALCULATE ( [CA HT], DATESQTD ( Dim_Date[Date] ) )
@@ -74,19 +86,23 @@ RETURN
     )
 ```
 
+**À tester.**
+
 ```dax
 CA HT moyenne mobile 3 mois =
 VAR _fin = MAX ( Dim_Date[Date] )
-VAR _periode = DATESINPERIOD ( Dim_Date[Date], _fin, -3, MONTH )
 RETURN
     IF (
         _fin <= [_Date max ventes],
-        AVERAGEX (
-            CALCULATETABLE ( VALUES ( Dim_Date[AnneeMois] ), _periode ),
-            CALCULATE ( [CA HT] )
+        CALCULATE (
+            AVERAGEX ( VALUES ( Dim_Date[AnneeMois] ), [CA HT] ),
+            DATESINPERIOD ( Dim_Date[Date], _fin, -3, MONTH )
         )
     )
 ```
+
+- Le filtre sur `Dim_Date[Date]` remplace celui du visuel : la mesure fonctionne quel que soit l'axe, à condition que `Dim_Date` soit **marquée comme table de dates** (sinon le filtre du visuel sur `AnneeMois` reste actif).
+- `AVERAGEX` ignore les mois dont le `[CA HT]` est `BLANK` : un mois sans vente n'est pas compté comme 0, la moyenne porte sur les mois non vides de la fenêtre. Pour compter ces mois comme 0, utiliser `[CA HT] + 0` dans l'itérateur.
 
 ## Cumul depuis l'origine
 

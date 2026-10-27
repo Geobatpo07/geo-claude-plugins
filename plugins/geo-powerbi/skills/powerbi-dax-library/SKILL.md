@@ -30,7 +30,7 @@ Appliquer `powerbi-conventions` (nommage, format, description) et `powerbi-perfo
 ## Règles de la bibliothèque
 
 - Time intelligence : toujours via `Dim_Date[Date]`, jamais via une date de la table de faits.
-- Masquer les valeurs futures : les mesures temps renvoient `BLANK()` au-delà de la dernière date de données (modèle `_dateMax` fourni).
+- Masquer les valeurs futures : les mesures temps renvoient `BLANK()` au-delà de la dernière date de données (mesure `_Date max ventes` fournie dans `references/time-intelligence.md`).
 - Les pourcentages sont des ratios (0.15) formatés `0.0 %`, pas des valeurs × 100.
 - Pas de `FORMAT()` dans une mesure numérique.
 
