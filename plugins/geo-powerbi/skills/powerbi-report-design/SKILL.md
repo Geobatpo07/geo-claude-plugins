@@ -18,7 +18,7 @@ description: "Charte graphique et règles de conception des rapports Power BI : 
 3. **Maquette HTML** de chaque page avec les champs réels du modèle → skill `powerbi-mockup`. Itérer sur la maquette (une phrase par changement) jusqu'à validation, **avant** de toucher au PBIP.
 4. **Références** : chercher dans [references/visuels/](references/visuels/README.md) un motif validé pour chaque visuel (cartes KPI, écarts, classements…) et le réutiliser.
 5. **Construire** dans le PBIP avec `powerbi-report-cli`, thème [references/theme-geo.json](references/theme-geo.json), jetons ci-dessous, fond SVG si besoin ([references/fonds-svg.md](references/fonds-svg.md)).
-6. **Vérifier visuellement** : recharger dans Desktop (changements externes ou Desktop Bridge), capture d'écran, corriger alignements, données et libellés ; recommencer jusqu'à conformité.
+6. **Vérifier visuellement** : recharger dans Desktop (« Apply external changes », préversion, ou Desktop Bridge ; deux mécanismes distincts, voir `powerbi-tmdl`), capture d'écran, corriger alignements, données et libellés ; recommencer jusqu'à conformité.
 7. **Contrôler** avec [references/checklist-accessibilite.md](references/checklist-accessibilite.md), puis **revue humaine** : chiffres contre la source. La validation des fichiers ne suffit pas.
 8. **Capitaliser** : chaque correction notable devient une nouvelle référence dans `references/visuels/`.
 

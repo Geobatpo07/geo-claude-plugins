@@ -127,7 +127,7 @@ Solder une dette : entrée `M-xxx` dans le journal → `D-xxx` déplacée dans �
 | `powerbi-modeling-mcp` en × | `/mcp` → Reconnect ; si fréquent : `$env:MCP_TIMEOUT="60000"` avant `claude` |
 | Écriture refusée par le mode auto | Projet sous Git + `.claude/settings.local.json`, ou mode par défaut (Shift+Tab) |
 | `python` ouvre le Microsoft Store | `winget install Python.Python.3.12`, puis rouvrir le terminal |
-| Changements non visibles dans Desktop | Appliquer les changements externes ou rouvrir le `.pbip` |
+| Changements non visibles dans Desktop | Appliquer les changements externes (préversion, Desktop d'août 2026 ou plus récent) ou rouvrir le `.pbip` |
 | Visuel très lent | « Diagnostique avec powerbi-performance » ; copier la requête de l'Analyseur de performances vers DAX Studio |
 
 Contribuer (nouvelle règle, nouvelle référence visuelle) : voir le `README.md` du dépôt `Geobatpo07/geo-claude-plugins`.

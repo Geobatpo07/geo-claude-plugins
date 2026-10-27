@@ -38,7 +38,11 @@ Exemples complets : [references/syntaxe.md](references/syntaxe.md).
 
 ## Processus d'édition
 
-1. **Synchronisation avec Power BI Desktop** (versions récentes de Desktop) : **enregistrer** dans Desktop avant d'écrire (l'agent lit les fichiers sur disque, pas la fenêtre). Après écriture, Desktop détecte les fichiers modifiés et propose d'**appliquer les changements externes** ; sinon, recharger via le **Desktop Bridge** (Options → Fonctionnalités en préversion → *Enable external tool access to Power BI Desktop through secure local APIs*) qui permet aussi à l'agent de faire des captures d'écran. Sur une version plus ancienne : **fermer Desktop** avant d'écrire. Dans tous les cas, ne jamais enregistrer depuis Desktop pendant que l'agent écrit (écrasement).
+1. **Synchronisation avec Power BI Desktop** (versions récentes de Desktop) : **enregistrer** dans Desktop avant d'écrire (l'agent lit les fichiers sur disque, pas la fenêtre). Deux mécanismes distincts :
+   - **Rechargement des changements externes** (fonction en **préversion**, Desktop d'**août 2026 ou plus récent**) : activer *Detect and reload external PBIP changes* (Options → Fonctionnalités en préversion, puis redémarrer Desktop). Après écriture, Desktop propose d'**appliquer les changements externes**. Sur une version plus ancienne ou sans cette option : **fermer Desktop** avant d'écrire.
+   - **Desktop Bridge** (rechargement programmatique et captures d'écran pour l'agent) : *Enable external tool access to Power BI Desktop through secure local APIs* dans Options → **Sécurité** → Desktop Bridge, **activé par défaut** ; la documentation le signale aussi comme préversion.
+
+   Dans tous les cas, ne jamais enregistrer depuis Desktop pendant que l'agent écrit (écrasement).
 2. Vérifier que le projet est sous **Git** et que l'arbre est propre (`git status`) pour pouvoir revenir en arrière.
 3. Lire `model.tmdl`, `relationships.tmdl` et les tables concernées avant d'écrire.
 4. Proposer les modifications (diff) et **attendre la validation** pour toute suppression, renommage ou changement de relation.
