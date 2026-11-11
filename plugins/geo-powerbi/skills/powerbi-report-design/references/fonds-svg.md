@@ -37,4 +37,4 @@ Règles de calcul : largeur d'une carte = (largeur utile − (n − 1) × espace
 - Les positions dans le SVG et dans les `visual.json` doivent être **identiques** : toute modification de mise en page impose de régénérer le fond.
 - Pas de texte dans le fond (non accessible, non traduisible) : les titres restent dans les visuels ou des zones de texte.
 - Garder le SVG simple (quelques kilo-octets).
-- Alternative graphique : concevoir le fond dans Figma (un connecteur Figma existe pour Claude) puis l'exporter en SVG.
+- Alternative graphique : concevoir le fond dans Figma (certains agents disposent d'un connecteur Figma) puis l'exporter en SVG.

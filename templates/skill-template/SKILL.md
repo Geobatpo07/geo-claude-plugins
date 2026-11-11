@@ -5,7 +5,7 @@ description: "Une ou deux phrases qui disent QUAND utiliser ce skill (situations
 
 # Titre du skill
 
-> Copier ce dossier vers `plugins/<plugin>/skills/<nom-du-skill>/`, renommer `name` (= nom du dossier), puis incrémenter la version du plugin.
+> Copier ce dossier vers `plugins/<plugin>/skills/<nom-du-skill>/`, renommer `name` (= nom du dossier), présenter le skill dans la commande `<plugin>-docs.md`, puis incrémenter la version du plugin. Écrire « l'agent », jamais le nom d'un produit : le skill doit servir à n'importe quel agent (règles : `AGENTS.md`).
 
 ## Quand l'utiliser
 

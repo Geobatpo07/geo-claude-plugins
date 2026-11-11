@@ -5,6 +5,7 @@ Usage :
   python lean.py audit <dossier PBIP | *.SemanticModel | fichier .pbip> [--changed] [--json]
   python lean.py usage <dossier PBIP> [--field "'Table'[Nom]" | --field "[Mesure]"] [--json]
   python lean.py dette <dossier PBIP> [--json]   # état de DETTE.md + MODIFICATIONS.md
+  python lean.py catalogue <dossier PBIP> [--json]   # dictionnaire de données (Markdown, sortie standard)
 
 Aucun fichier n'est modifié. Python 3.8+ ; bibliothèque standard uniquement.
 """
@@ -758,10 +759,164 @@ def print_debt(rep, root):
         print("Aucune incohérence entre DETTE.md et MODIFICATIONS.md.")
 
 
+# ───────────────────────── catalogue ─────────────────────────
+EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
+
+
+def mask(s):
+    """Jamais d'adresse e-mail dans la documentation générée."""
+    return EMAIL.sub("(e-mail masqué)", s or "")
+TABLE_TYPES = (("Fact_", "fait"), ("Dim_", "dimension"), ("_Mesures", "mesures"),
+               ("Param_", "paramètre"), ("CG_", "groupe de calcul"))  # préfixes de powerbi-conventions
+
+
+def catalogue(model, report, loc):
+    """Dictionnaire de données (structure JSON) ; rien n'est écrit sur disque."""
+    import datetime
+    used_m, _, _ = compute_usage(model, report)
+    has_report = bool(loc["report"])
+    tables, undocumented = [], []
+    for tn in sorted(model["tables"]):
+        tb = model["tables"][tn]
+        ttype = "groupe de calcul" if tb["calc_group"] is not None else next(
+            (lab for pre, lab in TABLE_TYPES if tn.startswith(pre)), "")
+        t_hidden = bool(tb["props"].get("isHidden"))
+        cols = []
+        for c in tb["columns"].values():
+            p = c["props"]
+            cols.append({"name": c["name"], "dataType": p.get("dataType", ""), "description": mask(c["desc"]),
+                         "hidden": bool(p.get("isHidden")), "calculated": c.get("expr") is not None,
+                         "summarizeBy": p.get("summarizeBy", ""),
+                         "sortByColumn": unquote(p.get("sortByColumn", "")) or "",
+                         "formatString": p.get("formatString", "")})
+            if not c["desc"] and not p.get("isHidden") and not t_hidden:
+                undocumented.append({"kind": "colonne", "object": key(tn, c["name"])})
+        measures = []
+        for m in tb["measures"].values():
+            p = m["props"]
+            fmt = p.get("formatString", "") or ("(dynamique)" if p.get("formatStringDefinition") else "")
+            measures.append({"name": m["name"], "displayFolder": p.get("displayFolder", ""),
+                             "description": mask(m["desc"]), "formatString": fmt, "hidden": bool(p.get("isHidden")),
+                             "expression": mask(dedent_expr(m["expr"])),
+                             "usedByReport": (m["name"].lower() in used_m) if has_report else None})
+            if not m["desc"] and not p.get("isHidden"):
+                undocumented.append({"kind": "mesure", "object": f"[{m['name']}] ({tn})"})
+        measures.sort(key=lambda x: (x["displayFolder"].lower(), x["name"].lower()))
+        if not tb["desc"] and not t_hidden and ttype != "mesures":
+            undocumented.append({"kind": "table", "object": tn})
+        tables.append({"name": tn, "type": ttype, "description": mask(tb["desc"]), "hidden": t_hidden,
+                       "columns": cols, "measures": measures})
+    rels = []
+    for r in model["relationships"]:
+        p = r["props"]
+        rels.append({"from": key(*r["from"]) if r["from"][0] else "?", "to": key(*r["to"]) if r["to"][0] else "?",
+                     "cardinality": f"{p.get('fromCardinality', 'many')} → {p.get('toCardinality', 'one')}",
+                     "crossFiltering": p.get("crossFilteringBehavior", "oneDirection"),
+                     "active": str(p.get("isActive", "true")).lower() != "false"})
+    rels.sort(key=lambda x: (x["from"], x["to"]))
+    roles = []
+    for ro in sorted(model["roles"], key=lambda x: x["name"]):
+        perms = []
+        for pm in ro["perms"]:
+            masked = bool(EMAIL.search(pm["expr"] or ""))  # jamais de donnée personnelle dans la documentation
+            perms.append({"table": pm["table"], "expression": None if masked else pm["expr"], "masked": masked})
+        roles.append({"name": ro["name"], "permissions": perms})
+    name = os.path.basename(os.path.dirname(loc["model"]))
+    return {
+        "model": name[: -len(".SemanticModel")] if name.endswith(".SemanticModel") else name,
+        "generated": datetime.date.today().isoformat(), "hasReport": has_report,
+        "stats": {"tables": len(tables), "columns": sum(len(t["columns"]) for t in tables),
+                  "measures": sum(len(t["measures"]) for t in tables), "relationships": len(rels),
+                  "roles": len(roles), "undocumented": len(undocumented)},
+        "tables": tables, "relationships": rels, "roles": roles, "undocumented": undocumented,
+    }
+
+
+def cell(s):
+    return esc(" ".join(str(s or "").split()))
+
+
+def yn(b):
+    return "oui" if b else "non"
+
+
+def dedent_expr(expr):
+    """Expression multi-ligne : retire l'indentation TMDL commune aux lignes qui suivent la première."""
+    lines = expr.strip("\n").split("\n")
+    rest = [ln for ln in lines[1:] if ln.strip()]
+    pad = min((len(ln) - len(ln.lstrip("\t ")) for ln in rest), default=0)
+    return "\n".join([lines[0].strip()] + [ln[pad:] for ln in lines[1:]])
+
+
+def print_catalogue(cat):
+    s = cat["stats"]
+    print(f"# Dictionnaire de données — {cat['model']}\n")
+    print(f"> Généré le {cat['generated']} par `lean.py catalogue`. Ne pas corriger ce fichier à la main : "
+          "corriger la description dans le modèle (TMDL), puis régénérer.\n")
+    print(f"{s['tables']} tables · {s['columns']} colonnes · {s['measures']} mesures · "
+          f"{s['relationships']} relations · {s['roles']} rôles · {s['undocumented']} objets visibles sans description\n")
+    if not cat["hasReport"]:
+        print("> ⚠ Pas de dossier .Report : « utilisée par le rapport » n'est pas renseigné.\n")
+    print("## Tables\n\n| Table | Type | Masquée | Colonnes | Mesures | Description |\n|---|---|---|---|---|---|")
+    for t in cat["tables"]:
+        print(f"| {esc(t['name'])} | {t['type']} | {yn(t['hidden'])} | {len(t['columns'])} | "
+              f"{len(t['measures'])} | {cell(t['description'])} |")
+    for t in cat["tables"]:
+        print(f"\n## {t['name']}\n")
+        if t["description"]:
+            print(t["description"] + "\n")
+        if t["columns"]:
+            print("### Colonnes\n\n| Colonne | Type | Description | Masquée | Agrégation | Triée par | Format |\n"
+                  "|---|---|---|---|---|---|---|")
+            for c in t["columns"]:
+                dtype = c["dataType"] + (" (calculée)" if c["calculated"] else "")
+                print(f"| {esc(c['name'])} | {dtype} | {cell(c['description'])} | {yn(c['hidden'])} | "
+                      f"{c['summarizeBy']} | {esc(c['sortByColumn'])} | {cell(c['formatString'])} |")
+            print()
+        folder = None
+        for m in t["measures"]:
+            if m["displayFolder"] != folder:
+                folder = m["displayFolder"]
+                print(f"### Mesures — {folder or '(sans dossier)'}\n")
+            print(f"#### {m['name']}\n")
+            print(m["description"] or "_Sans description._")
+            bits = [f"Format : `{m['formatString']}`" if m["formatString"] else "Format : —",
+                    f"Masquée : {yn(m['hidden'])}"]
+            if m["usedByReport"] is not None:
+                bits.append(f"Utilisée par le rapport : {yn(m['usedByReport'])}")
+            print("\n" + " · ".join(bits) + "\n")
+            print("```dax\n" + m["expression"] + "\n```\n")
+    print("\n## Relations\n")
+    if cat["relationships"]:
+        print("| De | Vers | Cardinalité | Filtrage croisé | Active |\n|---|---|---|---|---|")
+        for r in cat["relationships"]:
+            print(f"| {esc(r['from'])} | {esc(r['to'])} | {r['cardinality']} | {r['crossFiltering']} | "
+                  f"{yn(r['active'])} |")
+    else:
+        print("Aucune relation.")
+    print("\n## Rôles de sécurité (RLS)\n")
+    if cat["roles"]:
+        print("| Rôle | Table filtrée | Filtre |\n|---|---|---|")
+        for ro in cat["roles"]:
+            for pm in ro["permissions"] or [{"table": "(aucune)", "expression": "", "masked": False}]:
+                expr = "(masqué : contient une adresse e-mail)" if pm["masked"] else (
+                    f"`{cell(pm['expression'])}`" if pm["expression"] else "(aucun filtre de lignes)")
+                print(f"| {esc(ro['name'])} | {esc(pm['table'])} | {expr} |")
+    else:
+        print("Aucun rôle.")
+    print("\n## Sans description\n")
+    if cat["undocumented"]:
+        print("Objets visibles à documenter **dans le modèle** (demander la définition métier, ne pas l'inventer) :\n")
+        for u in cat["undocumented"]:
+            print(f"- {u['kind']} {u['object']}")
+    else:
+        print("Tous les objets visibles ont une description.")
+
+
 # ───────────────────────── main ─────────────────────────
 def main(argv):
-    if not argv or argv[0] not in ("audit", "usage", "dette"):
-        print('Usage : python lean.py audit|usage|dette <dossier PBIP> [--changed] [--field "Table[Nom]"] [--json]')
+    if not argv or argv[0] not in ("audit", "usage", "dette", "catalogue"):
+        print('Usage : python lean.py audit|usage|dette|catalogue <dossier PBIP> [--changed] [--field "Table[Nom]"] [--json]')
         return 0 if not argv else 1
     cmd, rest = argv[0], argv[1:]
     target = rest[0] if rest and not rest[0].startswith("--") else "."
@@ -785,6 +940,12 @@ def main(argv):
             print(json.dumps(res, ensure_ascii=False, indent=2))
         else:
             print_audit(res, loc)
+    elif cmd == "catalogue":
+        cat = catalogue(model, report, loc)
+        if "--json" in rest:
+            print(json.dumps(cat, ensure_ascii=False, indent=2))
+        else:
+            print_catalogue(cat)
     else:
         print_usage(model, report, field, "--json" in rest)
     return 0

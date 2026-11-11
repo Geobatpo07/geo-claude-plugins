@@ -1,0 +1,26 @@
+/// Une ligne par ligne de commande.
+table Fact_Ventes
+	lineageTag: a1
+
+	/// Montant hors taxes de la ligne.
+	column Montant
+		dataType: decimal
+		isHidden
+		formatString: #,##0.00
+		summarizeBy: sum
+		sourceColumn: Montant
+
+	column CustomerKey
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: CustomerKey
+
+	column DateCommande
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: DateCommande
+
+	partition Fact_Ventes = m
+		mode: import
+		source =
+				let Source = #table({"Montant"}, {}) in Source

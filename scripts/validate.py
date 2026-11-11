@@ -5,11 +5,13 @@ import os
 import re
 import sys
 
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8")
-    sys.stderr.reconfigure(encoding="utf-8")
+from common import ROOT, parse_frontmatter, read_text, utf8_console
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+utf8_console()
+# Skills et serveurs tiers (Microsoft) que nos skills peuvent citer sans les contenir.
+EXTERNAL = {"powerbi-report-cli", "powerbi-authoring", "powerbi-modeling-mcp"}
+# Marqueurs propres à un seul agent : les skills doivent rester lisibles par tous (Codex, Grok, Gemini…).
+AGENT_SPECIFIC = re.compile(r"CLAUDE_PLUGIN_ROOT|~/\.claude|\b(?:Claude|Codex|Grok|Gemini|Copilot|Cursor)\b")
 KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
 errors, warnings = [], []
@@ -24,16 +26,29 @@ def read_json(path):
         return None
 
 
-def parse_frontmatter(text):
-    m = re.match(r"^---\r?\n(.*?)\r?\n---", text.lstrip("﻿"), re.S)
-    if not m:
-        return None
-    fm = {}
-    for line in m.group(1).splitlines():
-        kv = re.match(r"^([A-Za-z_-]+):\s*(.*)$", line)
-        if kv:
-            fm[kv.group(1)] = re.sub(r"^[\"']|[\"']$", "", kv.group(2)).strip()
-    return fm
+def check_agents(folder, label, known=None):
+    """Sous-agents (*.md) : frontmatter name = nom du fichier, description ; skills cités existants."""
+    names = []
+    for f in sorted(os.listdir(folder)) if os.path.isdir(folder) else []:
+        if not f.endswith(".md"):
+            continue
+        text = read_text(os.path.join(folder, f))
+        fm = parse_frontmatter(text)
+        alabel = f"{label} : sous-agent {f}"
+        if fm is None:
+            errors.append(f"{alabel} sans frontmatter")
+            continue
+        if fm.get("name") != f[:-3] or not KEBAB.match(f[:-3]):
+            errors.append(f"{alabel} : name \"{fm.get('name')}\" ≠ nom du fichier (kebab-case)")
+        if not fm.get("description"):
+            errors.append(f"{alabel} : description manquante")
+        names.append((f[:-3], alabel, text))
+    if known is not None:
+        known = known | {n for n, _, _ in names}
+        for _, alabel, text in names:
+            for ref in sorted(set(re.findall(r"`(powerbi-[a-z0-9-]+)`", text)) - known - EXTERNAL):
+                errors.append(f"{alabel} : skill cité inconnu `{ref}`")
+    return {n for n, _, _ in names}
 
 
 def main():
@@ -74,6 +89,8 @@ def main():
             if not os.path.isdir(skills_dir):
                 warnings.append(f"{label} : aucun dossier skills/")
                 continue
+            known = {s for s in os.listdir(skills_dir) if os.path.isdir(os.path.join(skills_dir, s))}
+            known |= check_agents(os.path.join(pdir, "agents"), label, known)
             for s in sorted(os.listdir(skills_dir)):
                 sdir = os.path.join(skills_dir, s)
                 if not os.path.isdir(sdir):
@@ -104,9 +121,31 @@ def main():
                     warnings.append(f"{slabel} : {lines} lignes (> 300, déplacer vers references/)")
                 if docs_cmds and f"`{s}`" not in docs_text:
                     errors.append(f"{slabel} : absent de la commande de documentation ({os.path.basename(docs_cmds[0])})")
-                for ref in re.findall(r"\]\((references/[^)#\s]+)\)", text):
-                    if not os.path.exists(os.path.join(sdir, ref)):
-                        errors.append(f"{slabel} : lien cassé {ref}")
+                for dirpath, _, filenames in os.walk(sdir):
+                    for fn in sorted(filenames):
+                        if not fn.endswith(".md"):
+                            continue
+                        fpath = os.path.join(dirpath, fn)
+                        rel = os.path.relpath(fpath, sdir).replace(os.sep, "/")
+                        ftext = read_text(fpath)
+                        for ref in re.findall(r"\]\((?!https?:|#|mailto:)([^)#\s]+)", ftext):
+                            if "[" in ref or "<" in ref:  # espace réservé d'un modèle
+                                continue
+                            dest = os.path.normpath(os.path.join(dirpath, ref))
+                            if not dest.startswith(os.path.normpath(pdir) + os.sep):
+                                errors.append(f"{slabel} : {rel} référence un fichier hors du plugin ({ref})")
+                            elif not os.path.exists(dest):
+                                errors.append(f"{slabel} : lien cassé {ref} (dans {rel})")
+                        for ref in sorted(set(re.findall(r"`(powerbi-[a-z0-9-]+)`", ftext)) - known - EXTERNAL):
+                            errors.append(f"{slabel} : {rel} cite un skill inconnu `{ref}`")
+                        hit = AGENT_SPECIFIC.search(ftext)
+                        if hit and rel == "SKILL.md":
+                            warnings.append(f"{slabel} : SKILL.md nomme un agent précis (« {hit.group(0)} ») — "
+                                            "écrire « l'agent » pour rester portable")
+
+    check_agents(os.path.join(ROOT, ".claude", "agents"), "dépôt")
+    if not os.path.isfile(os.path.join(ROOT, "AGENTS.md")):
+        errors.append("AGENTS.md manquant à la racine (instructions communes à tous les agents)")
 
     for w in warnings:
         print(f"⚠  {w}", file=sys.stderr)

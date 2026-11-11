@@ -34,6 +34,8 @@ jobs:
         run: python scripts/generate_marketplace.py
       - name: Valider
         run: python scripts/validate.py
+      - name: Tests
+        run: python -m unittest discover -s tests
       - name: Commit si modifié
         run: |
           if git diff --quiet -- .claude-plugin plugins; then

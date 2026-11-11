@@ -1,6 +1,6 @@
 ---
-description: Guide d'utilisation du plugin geo-powerbi (skills, commandes, script lean.py, méthode de travail). Argument optionnel : une section.
-argument-hint: "[installation | skills | exemples | lean | dette | methode | securite | depannage]"
+description: Guide d'utilisation du plugin geo-powerbi (skills, sous-agents, script lean.py, fichiers de projet, méthode de travail, autres agents). Argument optionnel : une section.
+argument-hint: "[installation | skills | exemples | projet | agents | lean | dette | methode | securite | depannage]"
 ---
 
 Présente à l'utilisateur le guide ci-dessous, en français, **sans rien exécuter ni modifier**.
@@ -16,13 +16,15 @@ Présente à l'utilisateur le guide ci-dessous, en français, **sans rien exécu
 
 ## Vue d'ensemble
 
-`geo-powerbi` ajoute à Claude Code des **règles et méthodes maison** pour Power BI. Il complète les skills Microsoft (`fabric-skills`, `powerbi-authoring`), qui gèrent la **mécanique** (fichiers PBIP, API Fabric, connexion à Power BI Desktop). Les skills se chargent **automatiquement** selon votre demande : il suffit d'écrire ce que vous voulez en français.
+`geo-powerbi` ajoute à Claude Code des **règles et méthodes maison** pour gérer et développer un projet BI avec Power BI, du cadrage à l'exploitation. Il complète les skills Microsoft (`fabric-skills`, `powerbi-authoring`), qui gèrent la **mécanique** (fichiers PBIP, API Fabric, connexion à Power BI Desktop). Les skills se chargent **automatiquement** selon votre demande : il suffit d'écrire ce que vous voulez en français.
 
 | Section | Contenu |
 |---|---|
 | `installation` | Prérequis et installation |
-| `skills` | Les 9 skills et quand ils s'activent |
+| `skills` | Les 14 skills et quand ils s'activent |
 | `exemples` | Demandes prêtes à l'emploi |
+| `projet` | Phases d'un projet BI et fichiers à la racine du projet |
+| `agents` | Sous-agents fournis ; utilisation avec Codex, Grok, Gemini… |
 | `lean` | Le script d'analyse `lean.py` |
 | `dette` | `DETTE.md` et `MODIFICATIONS.md` |
 | `methode` | La méthode de travail recommandée |
@@ -49,6 +51,18 @@ Puis dans Claude Code : `/plugin` → **Marketplaces** → `geo-collection` et `
 Les rapports doivent être enregistrés au format **PBIP** (Power BI Desktop → Fichier → Enregistrer sous → *Fichiers projet Power BI*).
 
 ## skills
+
+**Piloter et livrer**
+
+| Skill | S'active quand vous… |
+|---|---|
+| `powerbi-project` | démarrez ou reprenez un projet, cadrez un besoin, définissez des KPI, demandez la prochaine étape ou si un livrable est terminé |
+| `powerbi-governance` | concevez ou relisez des rôles RLS / OLS, décidez qui voit quoi, préparez une publication (sensibilité, endossement, accès) |
+| `powerbi-testing` | voulez vérifier un modèle ou une mesure, prouver qu'un changement n'a rien cassé, tester la sécurité, conduire une recette |
+| `powerbi-alm` | organisez le dépôt, les branches, les environnements, une mise en production ou une intégration continue |
+| `powerbi-documentation` | documentez un modèle ou un rapport : dictionnaire de données, fiche de rapport, note de version, passation |
+
+**Construire**
 
 | Skill | S'active quand vous… |
 |---|---|
@@ -77,6 +91,47 @@ Les valeurs marquées « À ADAPTER » dans les skills (préfixes, couleurs, dev
 | Lenteur | « Ce visuel met 30 s à charger : diagnostique avec powerbi-performance, sans rien modifier. » |
 | Avant commit | « Fais une revue powerbi-lean de mes modifications. » |
 | Dette | « Où en est la dette du projet ? » / « Solde D-004 : la correction est faite et vérifiée. » |
+| Démarrer un projet | « Cadre un nouveau rapport de suivi de [sujet] : pose-moi les questions de la fiche de cadrage. » |
+| KPI | « Ajoute au catalogue KPI.md l'indicateur [nom] ; je te donne la définition métier. » |
+| Où en est-on ? | « Où en est ce projet et quelle est la prochaine étape ? » |
+| Sécurité | « Conçois les rôles RLS par région, montre-moi le plan et le protocole de test avant d'écrire. » |
+| Tests | « Écris les requêtes de contrôle du modèle (clés, intégrité, rapprochement) dans tests/. » |
+| Non-régression | « Je vais modifier [Mesure] : prépare le test avant / après. » |
+| Mise en production | « Passe la checklist de mise en production et dis-moi ce qui bloque. » |
+| CI | « Mets en place une intégration continue qui lance lean.py sur chaque demande de fusion. » |
+| Documentation | « Génère DICTIONNAIRE.md et liste les mesures sans description. » |
+| Avis indépendant | « Fais auditer ce projet par powerbi-auditeur pendant que je continue. » |
+
+## projet
+
+Le skill `powerbi-project` découpe un projet en phases ; chacune a un livrable, un skill qui fait foi et un critère de sortie :
+
+**cadrage → modélisation → mesures → maquette → rapport → tests et recette → publication → exploitation**
+
+Fichiers à la racine du projet (à côté du `.pbip`), versionnés avec lui :
+
+| Fichier | Rôle | Skill |
+|---|---|---|
+| `CADRAGE.md` | Public, questions métier, périmètre, sources, sécurité, critères de succès | `powerbi-project` |
+| `KPI.md` | Catalogue des indicateurs (`K-001`…) : définition métier, formule, mesure, propriétaire | `powerbi-project` |
+| `SECURITE.md` | Qui voit quoi : matrice rôle × périmètre, validation, date de test | `powerbi-governance` |
+| `tests/` et `tests/RECETTE.md` | Requêtes DAX de contrôle (`T-001`…) et procès-verbal de recette | `powerbi-testing` |
+| `DICTIONNAIRE.md` | Dictionnaire de données généré depuis le modèle | `powerbi-documentation` |
+| `DETTE.md`, `MODIFICATIONS.md` | Ce qui reste à corriger, ce qui a été fait | `powerbi-lean` |
+
+Aucun de ces fichiers ne contient de valeurs réelles ni de noms de personnes. Les décisions métier (définition d'un KPI, seuil, périmètre) restent à l'utilisateur : Claude propose, ne tranche pas.
+
+## agents
+
+**Sous-agents fournis** (Claude les lance quand la tâche s'y prête, ou sur demande : « fais auditer par powerbi-auditeur ») :
+
+| Sous-agent | Rôle |
+|---|---|
+| `powerbi-auditeur` | Relecteur en **lecture seule** : audit, revue d'un changement, contrôle avant mise en production |
+| `powerbi-modeleur` | Modèle sémantique et mesures DAX, une fois le plan validé |
+| `powerbi-concepteur-rapport` | Maquette, mise en page, visuels d'une page de rapport |
+
+**Autres agents** (Codex, Grok, Gemini, Copilot, Cursor…) : les skills sont au format ouvert Agent Skills et s'installent dans un projet avec `python scripts/install.py --agent <agent> --target <projet>` depuis une copie du dépôt `Geobatpo07/geo-claude-plugins`. Détails et emplacements par agent : `docs/agents.md` de ce dépôt. Toute l'équipe applique alors les mêmes règles, quel que soit l'outil.
 
 ## lean
 
@@ -88,6 +143,7 @@ python "<dossier du skill>/scripts/lean.py" audit <projet> --changed       # fic
 python "<dossier du skill>/scripts/lean.py" usage <projet>                 # champs utilisés par page / visuel
 python "<dossier du skill>/scripts/lean.py" usage <projet> --field "[Mesure]"
 python "<dossier du skill>/scripts/lean.py" dette <projet>                 # état DETTE.md + MODIFICATIONS.md
+python "<dossier du skill>/scripts/lean.py" catalogue <projet>             # dictionnaire de données (Markdown) sur la sortie standard
 ```
 
 `--json` donne une sortie exploitable. « Inutilisé » = non utilisé par **ce** rapport : vérifiez la vue de traçabilité de l'espace de travail avant de supprimer.
@@ -103,13 +159,15 @@ Solder une dette : entrée `M-xxx` dans le journal → `D-xxx` déplacée dans �
 
 ## methode
 
+0. **Cadrage** (`CADRAGE.md`, `KPI.md`) pour un nouveau projet ou un nouveau rapport.
 1. **Audit** en lecture seule.
 2. **Plan** priorisé : d'abord ce qui ne change pas les visuels, les renommages en dernier.
 3. **Commit de sauvegarde** ; Power BI Desktop enregistré.
 4. **Maquette HTML** pour toute nouvelle page.
 5. **Exécution** par étapes ; DAX montré avant application ; décisions métier laissées à l'utilisateur.
 6. **Vérification** dans Desktop (valeurs avant / après) et revue humaine.
-7. **Revue powerbi-lean**, journal, commit, push.
+7. **Tests et recette** (`tests/`, `tests/RECETTE.md`) ; sécurité vérifiée par rôle.
+8. **Revue powerbi-lean**, journal, documentation régénérée, commit ; la mise en production suit la checklist de `powerbi-alm`.
 
 ## securite
 
@@ -127,7 +185,7 @@ Solder une dette : entrée `M-xxx` dans le journal → `D-xxx` déplacée dans �
 | `powerbi-modeling-mcp` en × | `/mcp` → Reconnect ; si fréquent : `$env:MCP_TIMEOUT="60000"` avant `claude` |
 | Écriture refusée par le mode auto | Projet sous Git + `.claude/settings.local.json`, ou mode par défaut (Shift+Tab) |
 | `python` ouvre le Microsoft Store | `winget install Python.Python.3.12`, puis rouvrir le terminal |
-| Changements non visibles dans Desktop | Appliquer les changements externes ou rouvrir le `.pbip` |
+| Changements non visibles dans Desktop | Appliquer les changements externes (préversion, Desktop d'août 2026 ou plus récent) ou rouvrir le `.pbip` |
 | Visuel très lent | « Diagnostique avec powerbi-performance » ; copier la requête de l'Analyseur de performances vers DAX Studio |
 
 Contribuer (nouvelle règle, nouvelle référence visuelle) : voir le `README.md` du dépôt `Geobatpo07/geo-claude-plugins`.

@@ -1,0 +1,24 @@
+table _Mesures
+
+	/// Chiffre d'affaires hors taxes.
+	measure 'CA HT' = SUM(Fact_Ventes[Montant])
+		formatString: #,##0 €
+		displayFolder: 01 Ventes
+
+	measure 'CA HT YTD' =
+			// QUOI : cumul annuel du CA HT.
+			CALCULATE(
+			    [CA HT],
+			    DATESYTD(Dim_Date[Date])
+			)
+		formatString: #,##0 €
+		displayFolder: 01 Ventes
+
+	/// Nombre de clients distincts ayant commandé.
+	measure 'Nb clients' = DISTINCTCOUNT(Fact_Ventes[CustomerKey])
+		formatString: #,##0
+		displayFolder: 03 Clients
+
+	measure '_CA Base' = [CA HT]
+		isHidden
+		displayFolder: 90 Technique

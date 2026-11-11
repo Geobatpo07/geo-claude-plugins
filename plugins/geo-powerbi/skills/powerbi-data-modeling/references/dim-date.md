@@ -11,8 +11,18 @@
 
 ```dax
 Dim_Date =
-VAR _debut = DATE ( YEAR ( MIN ( Fact_Ventes[DateCommande] ) ), 1, 1 )
-VAR _fin = DATE ( YEAR ( MAX ( Fact_Ventes[DateCommande] ) ), 12, 31 )
+VAR _debut =
+    DATE (
+        YEAR ( MIN ( MIN ( Fact_Ventes[DateCommande] ), MIN ( Fact_Ventes[DateLivraison] ) ) ),
+        1,
+        1
+    )
+VAR _fin =
+    DATE (
+        YEAR ( MAX ( MAX ( Fact_Ventes[DateCommande] ), MAX ( Fact_Ventes[DateLivraison] ) ) ),
+        12,
+        31
+    )
 RETURN
     ADDCOLUMNS (
         CALENDAR ( _debut, _fin ),
@@ -26,6 +36,8 @@ RETURN
         "EstJourOuvre", WEEKDAY ( [Date], 2 ) <= 5
     )
 ```
+
+Les bornes couvrent **toutes** les colonnes de date des faits utilisées dans le modèle (ici `DateCommande` et `DateLivraison`) : ajouter ou retirer une colonne dans les `MIN` / `MAX` selon les dates réellement reliées à `Dim_Date`. Avec la seule `DateCommande`, une livraison hors de cette plage n'aurait pas de ligne dans `Dim_Date`. À tester.
 
 ## Version Power Query (M)
 
