@@ -19,6 +19,10 @@
 1. Point de départ : tous les champs référencés dans les fichiers JSON du rapport (visuels, filtres de visuel, de page et de rapport, signets, mises en forme conditionnelles), les colonnes des relations, les rôles RLS, les groupes de calcul, les tables calculées (dont les paramètres de champs) et la clé de la table de dates.
 2. Propagation : une mesure utilisée rend utilisées les mesures et colonnes de son DAX ; une colonne utilisée rend utilisée sa colonne de tri et le DAX d'une colonne calculée.
 
+## `lean.py catalogue`
+
+Même lecture du modèle et même calcul d'utilisation, restitués en dictionnaire de données (tables, colonnes, mesures et leur DAX, relations, rôles, objets visibles sans description) sur la sortie standard ; rien n'est écrit sur disque. Les adresses e-mail sont masquées partout (descriptions, DAX des mesures) et le filtre d'un rôle qui en contient une n'est pas recopié. **Seules les adresses e-mail** le sont : un nom de personne ou un identifiant `DOMAINE\compte` en dur est recopié — le signaler (`powerbi-governance`). L'OLS n'est pas restituée. Le type de table est déduit des préfixes de `powerbi-conventions` (`Fact_`, `Dim_`, `_Mesures`, `Param_`, `CG_`) ; vide sinon. Usage : skill `powerbi-documentation`.
+
 ## Limites
 
 - **Un seul rapport** : les rapports connectés au modèle publié, les classeurs Excel et les requêtes externes ne sont pas visibles.

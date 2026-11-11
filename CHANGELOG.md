@@ -2,6 +2,38 @@
 
 Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) — versionnement [SemVer](https://semver.org/lang/fr/).
 
+## [1.6.0] — 2026-11-11
+
+Le plugin passe de « règles pour construire un modèle et un rapport » à la gestion d'un projet BI de bout en bout, et s'ouvre aux agents autres que Claude Code.
+
+### Ajouté
+- Skill **`powerbi-project`** : phases d'un projet BI (cadrage → exploitation), livrable et critère de sortie de chaque phase, skill qui fait foi, fiche de cadrage `CADRAGE.md`, catalogue de KPI `KPI.md`, rôles, definition of done.
+- Skill **`powerbi-governance`** : RLS statique et dynamique, OLS, étiquettes de sensibilité, endossement, rôles d'espace de travail, partage, données personnelles, fiche `SECURITE.md`.
+- Skill **`powerbi-testing`** : six niveaux de test (intégrité, rapprochement, mesures, non-régression, RLS, rapport), requêtes DAX de contrôle, dossier `tests/` et procès-verbal `tests/RECETTE.md`.
+- Skill **`powerbi-alm`** : dépôt PBIP, `.gitignore`, branches et commits, environnements, choix pipelines de déploiement / intégration Git, portes de qualité, exemples de CI (GitHub Actions, Azure DevOps), versions et retour arrière.
+- Skill **`powerbi-documentation`** : dictionnaire de données généré, fiche de rapport, note de version, dossier de passation.
+- `lean.py catalogue` : dictionnaire de données en Markdown (ou `--json`) sur la sortie standard, à partir du TMDL et du rapport ; un filtre RLS qui contient une adresse e-mail n'est pas recopié.
+- Sous-agents du plugin (`plugins/geo-powerbi/agents/`) : `powerbi-auditeur` (lecture seule), `powerbi-modeleur`, `powerbi-concepteur-rapport`.
+- **Ouverture aux autres agents** : `scripts/install.py` installe les skills dans un projet BI pour Codex, Grok, Gemini, Copilot, Cursor ou tout agent qui lit `AGENTS.md` (copie des skills, bloc d'index dans `AGENTS.md`, mise à jour et désinstallation propres) ; `scripts/build_dist.py` produit un `.zip` par skill, un `.zip` d'ensemble et tous les skills en un seul fichier Markdown ; guide `docs/agents.md`.
+- `AGENTS.md` devient la source des règles du dépôt pour tous les agents (section « Portabilité entre agents ») ; `CLAUDE.md` l'importe.
+- Rôles de maintenance du dépôt dans `.claude/agents/` : `skill-author`, `skill-reviewer`, `dax-verifier`, `release-manager`.
+- `validate.py` : contrôle des sous-agents, des liens relatifs de tous les fichiers Markdown d'un skill (cassés ou hors du plugin), des skills cités qui n'existent pas ; avertissement si un `SKILL.md` nomme un agent précis.
+- Tests (`tests/`, `python -m unittest discover -s tests`) des scripts du dépôt et de `lean.py` sur un projet PBIP d'exemple ; workflow `validate.yml` sur chaque demande de fusion et chaque branche.
+- `/geo-powerbi-docs` : sections `projet` et `agents`, 14 skills, nouveaux exemples de demandes.
+
+### Modifié
+- `powerbi-conventions` : la section « Sécurité et gouvernance » renvoie à `powerbi-governance` pour la conception des rôles.
+- `powerbi-report-design` (`fonds-svg.md`) : formulation indépendante de l'agent.
+- `README.md` : contenu par étape du projet, installation pour les autres agents.
+
+### À valider
+Aucun moteur DAX n'était disponible : rien de ce qui suit n'a été exécuté.
+- Requêtes DAX de contrôle de `powerbi-testing` (`requetes-controle.md`).
+- Exemples TMDL et DAX de rôles RLS / OLS de `powerbi-governance` (`rls-ols.md`).
+- Workflows GitHub Actions et Azure DevOps de `powerbi-alm` (`ci-exemple.md`) : YAML relus, jamais lancés.
+- Emplacements des skills par agent (`docs/agents.md`) : relevés dans la documentation des éditeurs, non testés avec chaque agent ; celui de Cursor au niveau du projet n'est pas confirmé.
+- `lean.py catalogue` : testé sur le projet d'exemple `tests/fixture/Demo` seulement.
+
 ## [1.5.1] — 2026-10-27
 
 ### Corrigé

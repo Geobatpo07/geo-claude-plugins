@@ -1,0 +1,28 @@
+table Dim_Client
+
+	column CustomerKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+	/// Nom commercial | affiché dans les rapports.
+	column 'Nom client'
+		dataType: string
+		sortByColumn: CustomerKey
+		summarizeBy: none
+		sourceColumn: Nom
+
+	column Region
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Region
+
+	column Email
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Email
+
+	column 'Nom long' = Dim_Client[Nom client] & " (" & Dim_Client[Region] & ")"
+		dataType: string
+		summarizeBy: none

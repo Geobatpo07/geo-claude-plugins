@@ -7,7 +7,7 @@ description: "Conventions maison pour Power BI : nommage des tables, colonnes et
 
 > Valeurs par défaut fondées sur les bonnes pratiques reconnues. Les sections marquées **À ADAPTER** doivent être remplacées par les règles validées de l'équipe.
 
-Ce skill fait foi pour le **style**. Les skills Microsoft (`semantic-model-authoring`, `powerbi-report-cli`) font foi pour la **mécanique** (API, fichiers, MCP). Les skills `powerbi-data-modeling`, `powerbi-dax-library`, `powerbi-performance`, `powerbi-tmdl`, `powerbi-report-design` et `powerbi-html-visuals` appliquent ces conventions.
+Ce skill fait foi pour le **style**. Les skills Microsoft (`semantic-model-authoring`, `powerbi-report-cli`) font foi pour la **mécanique** (API, fichiers, MCP). Tous les autres skills `powerbi-*` du plugin appliquent ces conventions ; `powerbi-project` dit lequel fait foi à chaque phase d'un projet.
 
 ## Processus obligatoire avant toute modification
 
@@ -95,6 +95,8 @@ Un projet PBIP ne contient pas les lignes de données, mais ses **métadonnées*
 
 ### Règles
 
-- RLS : rôles nommés `RLS_<périmètre>` (`RLS_Region`), filtres sur les dimensions, jamais sur les faits ; tester avec « Afficher en tant que ».
+Conception des rôles (RLS / OLS), accès, partage, endossement et fiche `SECURITE.md` : `powerbi-governance`. Ici, seulement les règles de nommage et de base.
+
+- RLS : rôles nommés `RLS_<périmètre>` (`RLS_Region`), filtres sur les dimensions, jamais sur les faits ; tester avec « Afficher comme ».
 - Ne jamais écrire d'identifiants, mots de passe ou chaînes de connexion en clair dans le modèle ou les paramètres.
 - Étiquette de sensibilité obligatoire avant publication — **À ADAPTER**.

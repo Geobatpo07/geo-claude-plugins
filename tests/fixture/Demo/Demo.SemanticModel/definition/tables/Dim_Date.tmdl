@@ -1,0 +1,10 @@
+/// Calendrier.
+table Dim_Date
+	dataCategory: Time
+
+	/// Jour.
+	column Date
+		dataType: dateTime
+		isKey
+		summarizeBy: none
+		sourceColumn: Date

@@ -1,9 +1,9 @@
 {
   "name": "geo-powerbi",
-  "version": "1.5.1",
-  "description": "Conventions, modélisation, TMDL, DAX, performance, revue et audit (powerbi-lean), maquettes HTML, design de rapports et visuels HTML/SVG pour Power BI.",
+  "version": "1.6.0",
+  "description": "Gestion et développement de projets BI avec Power BI : cadrage et pilotage, conventions, modélisation, TMDL, DAX, performance, gouvernance et sécurité, tests et recette, cycle de vie (Git, déploiement, CI), documentation, revue et audit (powerbi-lean), maquettes HTML, design de rapports et visuels HTML/SVG.",
   "author": {
     "name": "Geovany LAGUERRE"
   },
-  "keywords": ["powerbi", "dax", "tmdl", "semantic-model", "data-modeling", "report-design", "mockup", "review", "audit", "svg", "html"]
+  "keywords": ["powerbi", "dax", "tmdl", "semantic-model", "data-modeling", "report-design", "mockup", "review", "audit", "svg", "html", "governance", "rls", "testing", "alm", "documentation", "project", "agent-skills"]
 }

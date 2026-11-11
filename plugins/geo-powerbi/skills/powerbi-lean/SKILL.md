@@ -20,6 +20,7 @@ python "<dossier du skill>/scripts/lean.py" usage "<dossier>"                   
 python "<dossier du skill>/scripts/lean.py" usage "<dossier>" --field "'Table'[Colonne]" # où un champ est utilisé
 python "<dossier du skill>/scripts/lean.py" usage "<dossier>" --field "[Mesure]"
 python "<dossier du skill>/scripts/lean.py" dette "<dossier>"                            # état DETTE.md + MODIFICATIONS.md
+python "<dossier du skill>/scripts/lean.py" catalogue "<dossier>"                        # dictionnaire de données (Markdown, voir powerbi-documentation)
 ```
 
 Ajouter `--json` pour une sortie exploitable. Sous Windows, utiliser `python` (ou `py`) ; ailleurs `python3`. Le dossier peut être celui du `.pbip`, du `*.SemanticModel` ou le fichier `.pbip`. Ce que le script vérifie et ses limites : [references/regles-audit.md](references/regles-audit.md).
